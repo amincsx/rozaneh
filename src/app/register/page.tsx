@@ -31,7 +31,7 @@ export default function RegisterPage() {
     };
 
     const validateForm = () => {
-        const newErrors: any = {};
+        const newErrors: Record<string, string> = {};
 
         if (!formData.firstName.trim()) {
             newErrors.firstName = 'نام اجباری است';
@@ -77,7 +77,8 @@ export default function RegisterPage() {
 
             // Redirect to dashboard after successful registration
             window.location.href = '/dashboard';
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error(error);
             alert('خطا در ثبت نام. لطفا دوباره تلاش کنید');
         } finally {
             setIsSubmitting(false);

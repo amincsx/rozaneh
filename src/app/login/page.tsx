@@ -27,7 +27,7 @@ export default function LoginPage() {
     };
 
     const validateForm = () => {
-        const newErrors: any = {};
+        const newErrors: Record<string, string> = {};
 
         if (!formData.email.trim()) {
             newErrors.email = 'ایمیل اجباری است';
@@ -57,7 +57,8 @@ export default function LoginPage() {
 
             // Redirect to dashboard after successful login
             window.location.href = '/dashboard';
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error(error);
             alert('ایمیل یا رمز عبور اشتباه است');
         } finally {
             setIsSubmitting(false);
