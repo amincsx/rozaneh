@@ -1,11 +1,11 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
+import { PrismaClient } from "@prisma/client"
 
-let prismaInstance: any = null
+let prismaInstance: PrismaClient | null = null
 
-async function getPrisma() {
+async function getPrisma(): Promise<PrismaClient> {
     if (!prismaInstance) {
         const { prisma } = await import("@/lib/prisma")
         prismaInstance = prisma
