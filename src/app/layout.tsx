@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,8 +20,9 @@ const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "Rozaneh",
-  description: "Rozaneh - Your Next.js Application",
+  title: "روزنه - بهترین پلتفرم مشاوره آنلاین ایران",
+  description: "کلینیک روزنه - ارائه خدمات مشاوره و روانشناسی آنلاین با بهترین متخصصان ایران",
+  keywords: "مشاوره آنلاین، روانشناس، درمانگر، سلامت روان، کلینیک روزنه",
 };
 
 export default function RootLayout({
@@ -29,11 +31,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fa" dir="rtl">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${ibmPlexSansArabic.variable} antialiased`}
       >
-        {children}
+        <Providers>
+          <div className="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-blue-50">
+            <main>{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   );

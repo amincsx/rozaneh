@@ -1,0 +1,235 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(PATIENT)
+  phone         String?
+  nationalId    String?   @unique
+  birthDate     DateTime?
+  gender        Gender?
+  address       String?
+  emergencyContact String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  
+  // Patient specific relations
+  appointments  Appointment[] @relation("PatientAppointments")
+  assessments   Assessment[]
+  medicalHistory MedicalHistory[]
+  
+  // Therapist specific relations
+  therapistProfile TherapistProfile?
+  therapistAppointments Appointment[] @relation("TherapistAppointments")
+  
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model TherapistProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  licenseNumber   String   @unique
+  specializations String[]
+  experience      Int
+  education       String[]
+  bio             String?
+  hourlyRate      Decimal
+  availableHours  Json
+  languages       String[]
+  isVerified      Boolean  @default(false)
+  rating          Decimal? @default(0)
+  totalSessions   Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("therapist_profiles")
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  patientId   String
+  therapistId String
+  dateTime    DateTime
+  duration    Int               @default(60) // minutes
+  status      AppointmentStatus @default(SCHEDULED)
+  type        AppointmentType   @default(VIDEO_CALL)
+  notes       String?
+  price       Decimal
+  paymentId   String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  patient     User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  therapist   User              @relation("TherapistAppointments", fields: [therapistId], references: [id])
+  payment     Payment?          @relation(fields: [paymentId], references: [id])
+  videoSession VideoSession?
+
+  @@map("appointments")
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  amount        Decimal
+  currency      String        @default("IRR")
+  status        PaymentStatus @default(PENDING)
+  method        String        // zarinpal, parsian, etc.
+  transactionId String?       @unique
+  gatewayRef    String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  appointments  Appointment[]
+  
+  @@map("payments")
+}
+
+model Assessment {
+  id          String           @id @default(cuid())
+  userId      String
+  type        AssessmentType
+  title       String
+  questions   Json
+  answers     Json?
+  score       Int?
+  result      String?
+  completedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user        User             @relation(fields: [userId], references: [id])
+  
+  @@map("assessments")
+}
+
+model MedicalHistory {
+  id                String   @id @default(cuid())
+  userId            String
+  allergies         String[]
+  medications       String[]
+  previousTherapy   Boolean  @default(false)
+  mentalHealthConditions String[]
+  familyHistory     String[]
+  traumaHistory     String?
+  substanceUse      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id])
+  
+  @@map("medical_history")
+}
+
+model VideoSession {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique
+  sessionToken  String   @unique
+  startTime     DateTime?
+  endTime       DateTime?
+  recordingUrl  String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  
+  @@map("video_sessions")
+}
+
+enum UserRole {
+  PATIENT
+  THERAPIST
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  VIDEO_CALL
+  PHONE_CALL
+  IN_PERSON
+  CHAT
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum AssessmentType {
+  DEPRESSION
+  ANXIETY
+  STRESS
+  PERSONALITY
+  COGNITIVE
+  CUSTOM
+}
