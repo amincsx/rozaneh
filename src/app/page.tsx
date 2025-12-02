@@ -48,11 +48,16 @@ export default function Home() {
         @media (max-width: 767px) {
           .hero-first-section {
             background-size: 250%;
-            background-position: left 30% top 85%;
+            background-position: left 30% top 95%;
           }
         }
         .hero-second-section {
-          background-image: url(/bg%202-01.svg);
+          background-image: none;
+        }
+        @media (min-width: 1024px) {
+          .hero-second-section {
+            background-image: url(/bg%202-01.svg);
+          }
         }
         @media (max-width: 767px) {
           .hero-second-section {
@@ -148,7 +153,7 @@ export default function Home() {
         </nav>
 
         {/* Main Content */}
-        <div dir="rtl" className="absolute top-3/9 md:top-120 right-4 md:right-12 lg:right-20 3xl:right-56 transform -translate-y-1/2 text-right max-w-[calc(100vw-2rem)] md:max-w-lg 2xl:max-w-4xl 3xl:max-w-7xl font-arabic px-2">
+        <div dir="rtl" className="absolute top-3/8 md:top-120 right-4 md:right-12 lg:right-20 3xl:right-56 transform -translate-y-1/2 text-right max-w-[calc(100vw-2rem)] md:max-w-lg 2xl:max-w-4xl 3xl:max-w-7xl font-arabic px-2">
           <h1 className="font-bold text-teal-700 mb-3 md:mb-4 3xl:mb-12 leading-tight text-2xl md:text-4xl 4xl:text-6xl text-right">
             سفر شما به سوی سلامت روان
             <br />
@@ -174,7 +179,7 @@ export default function Home() {
         className="hero-second-section font-sans w-full h-[vh] md:h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden"
       >
         {/* Heading */}
-        <h3 dir="rtl" className="absolute top-16 md:top-32 right-4 md:right-12 lg:right-20 3xl:right-56 text-right font-bold text-teal-700 text-lg md:text-2xl lg:text-3xl font-arabic max-w-[calc(100vw-2rem)] px-2">
+        <h3 dir="rtl" className="absolute top-16 md:top-32 right-4 md:right-12 lg:right-20 3xl:right-56 text-right font-bold text-teal-700 text-base md:text-2xl lg:text-3xl font-arabic max-w-[calc(100vw-2rem)] px-2">
           تیمی از روانشناسان و مشاوران متخصص و با تجربه
         </h3>
 
@@ -200,10 +205,10 @@ export default function Home() {
         className="hero-third-section font-sans w-full h-[40vh] md:h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden"
       >
         {/* Free Online Tests Heading */}
-        <h1 dir="rtl" className="absolute top-0 md:top-1/2 left-1/2 transform -translate-x-1/2 md:translate-x-90 md:translate-y-12 text-center font-bold text-teal-700 text-lg md:text-2xl lg:text-4xl font-arabic px-4 max-w-[90vw] z-10">
+        <h1 dir="rtl" className="absolute top-0 md:top-1/2 left-1/2 transform -translate-x-1/2 md:translate-x-90 md:translate-y-12 text-center font-bold text-teal-700 text-base md:text-2xl lg:text-4xl font-arabic px-4 max-w-[90vw] z-10">
           تست های رایگان آنلاین
         </h1>
-        <p dir="rtl" className="absolute top-6 md:top-1/2 left-1/2 transform -translate-x-1/2 md:translate-x-75 md:translate-y-24 text-center text-gray-700 leading-relaxed font-regular text-sm md:text-base 4xl:text-2xl font-arabic max-w-xs md:max-w-md px-4 z-10">
+        <p dir="rtl" className="absolute top-8 md:top-1/2 left-1/2 transform -translate-x-1/2 md:translate-x-75 md:translate-y-24 text-center text-gray-700 leading-relaxed font-regular text-xs md:text-base 4xl:text-2xl font-arabic max-w-xs md:max-w-md px-4 z-10">
           به‌روزترین و معتبرترین تست‌های روانشناسی به صورت کاملاً رایگان.
         </p>
 
