@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { Metadata } from "next";
+
+// Note: Since this is a client component, metadata should be moved to layout.tsx or a server component wrapper
 
 export default function ServicesPage() {
     const services = [

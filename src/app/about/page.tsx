@@ -5,6 +5,9 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Users, Heart } from "lucide-react";
+import { Metadata } from "next";
+
+// Note: Since this is a client component, metadata should be moved to layout.tsx or a server component wrapper
 
 export default function AboutPage() {
     const router = useRouter();

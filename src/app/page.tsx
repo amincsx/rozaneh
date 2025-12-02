@@ -1,5 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "کلینیک روانشناسی روزنه - مشاوره آنلاین با بهترین متخصصان ایران",
+  description: "کلینیک روزنه بهترین مرکز مشاوره آنلاین ایران. رزرو نوبت آنلاین، مشاوره فوری، تست‌های روانشناختی رایگان و خدمات تخصصی با روانشناسان مجرب",
+  keywords: [
+    "مشاوره آنلاین",
+    "کلینیک روانشناسی",
+    "روانشناس تهران",
+    "مشاوره فوری", 
+    "رزرو نوبت آنلاین",
+    "تست روانشناختی رایگان",
+    "مشاوره خانوادگی",
+    "زوج درمانی",
+    "درمان افسردگی",
+    "مشاوره پیش از ازدواج"
+  ],
+  openGraph: {
+    title: "کلینیک روانشناسی روزنه - بهترین مرکز مشاوره آنلاین ایران",
+    description: "رزرو نوبت آنلاین، مشاوره فوری و خدمات روانشناختی تخصصی با بهترین متخصصان",
+    url: "https://rozaneh.com",
+    images: [
+      {
+        url: "/rozaneh pics/1.webp",
+        width: 1200,
+        height: 630,
+        alt: "کلینیک روانشناسی روزنه"
+      }
+    ]
+  },
+  alternates: {
+    canonical: "https://rozaneh.com"
+  }
+};
 
 export default function Home() {
   return (

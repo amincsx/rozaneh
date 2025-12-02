@@ -235,8 +235,49 @@ export default function TherapistProfilePage() {
         )
     }
 
+    // Generate structured data for the therapist
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": therapist.name,
+        "image": therapist.image ? `https://rozaneh.com${therapist.image}` : undefined,
+        "jobTitle": "روانشناس و مشاور",
+        "worksFor": {
+            "@type": "MedicalOrganization",
+            "name": "کلینیک روانشناسی روزنه",
+            "url": "https://rozaneh.com"
+        },
+        "knowsAbout": therapist.specializations,
+        "description": therapist.bio,
+        "hasCredential": therapist.specializations.map(spec => ({
+            "@type": "EducationalOccupationalCredential",
+            "credentialCategory": spec
+        })),
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": therapist.rating,
+            "reviewCount": comments.length
+        },
+        "offers": {
+            "@type": "Offer",
+            "description": "خدمات مشاوره روانشناختی",
+            "price": therapist.hourlyRate,
+            "priceCurrency": "IRR",
+            "availability": "https://schema.org/InStock"
+        }
+    };
+
     return (
-        <main className="min-h-screen w-full font-farsi bg-slate-50">
+        <>
+            {/* Structured Data */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(structuredData)
+                }}
+            />
+            
+            <main className="min-h-screen w-full font-farsi bg-slate-50">
             {/* Back Button */}
             <div className="px-4 sm:px-6 lg:px-8 pt-4 ml-4">
                 <Link href="/therapists" className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-light px-4 py-2 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm">
@@ -451,6 +492,7 @@ export default function TherapistProfilePage() {
                 </div>
             </footer>
         </main>
+        </>
     )
 }
 
