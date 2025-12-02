@@ -269,23 +269,23 @@ export default function TherapistsPage() {
                 </div>
 
                 {/* Results */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                     {filteredTherapists.map((therapist) => (
                         <div key={therapist.id} className="bg-white/50 backdrop-blur-lg rounded-2xl border border-white/40 shadow-xl overflow-hidden group transform hover:-translate-y-2 transition-transform duration-300">
                             {therapist.image && (
-                                <div className="relative h-80 w-full overflow-hidden bg-transparent flex items-center justify-center">
+                                <div className="relative h-48 sm:h-64 md:h-80 w-full overflow-hidden bg-transparent flex items-center justify-center">
                                     <svg className="absolute inset-0 w-full h-full z-0" viewBox="0 0 100 100">
                                         <circle cx="50" cy="50" r="45" fill="#24a590ff" opacity="0.4" />
                                     </svg>
                                     <img
                                         src={therapist.image}
                                         alt={therapist.name}
-                                        className="relative z-10 w-140 h-140 object-contain group-hover:scale-110 transition-transform duration-500"
+                                        className="relative z-10 w-48 h-48 sm:w-52 sm:h-52 md:w-140 md:h-140 object-contain group-hover:scale-110 transition-transform duration-500"
                                     />
                                 </div>
                             )}
-                            <div className="p-6 text-gray-800">
-                                <h3 className="text-2xl font-bold font-arabic mb-2 drop-shadow-sm">
+                            <div className="p-4 md:p-6 text-gray-800">
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold font-arabic mb-2 drop-shadow-sm">
                                     {therapist.name}
                                 </h3>
                                 <div className="mb-4 h-16 overflow-y-auto">

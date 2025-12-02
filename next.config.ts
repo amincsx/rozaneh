@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Enable static optimization
   trailingSlash: false,
-  
+
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
 
   // Compression
   compress: true,
-  
+
   // Headers for SEO and security
   async headers() {
     return [

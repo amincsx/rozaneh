@@ -24,13 +24,13 @@ export default function Navbar({ textColor = "gray", backButtonText = "بازگ�
     };
 
     return (
-        <nav className="absolute top-6 right-4 md:right-20 z-50">
-            <div className="bg-white/50 backdrop-blur-lg border border-white/80 rounded-lg px-4 py-2 shadow-xl hover:shadow-2xl transition-shadow">
+        <nav className="absolute top-16 md:top-6 right-4 md:right-20 z-50">
+            <div className="bg-white/50 backdrop-blur-lg border border-white/80 rounded-lg px-2 md:px-4 py-1 md:py-2 shadow-xl hover:shadow-2xl transition-shadow">
                 <button
                     onClick={handleBackClick}
-                    className={`group flex items-center justify-center gap-1 ${textColorClass} font-regular transition-all duration-300 px-2 py-1 rounded-md text-sm inline-flex transform hover:scale-110`}
+                    className={`group flex items-center justify-center gap-0.5 ${textColorClass} font-regular transition-all duration-300 px-1 md:px-2 py-0.5 md:py-1 rounded-md text-[10px] md:text-sm inline-flex transform hover:scale-110`}
                 >
-                    <ArrowRight className={`w-4 h-4 flex-shrink-0 ${iconColorClass}`} />
+                    <ArrowRight className={`w-2.5 md:w-4 h-2.5 md:h-4 flex-shrink-0 ${iconColorClass}`} />
                     <span className="font-farsi leading-none">{backButtonText}</span>
                 </button>
             </div>

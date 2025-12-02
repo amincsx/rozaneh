@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "مشاوره آنلاین",
     "کلینیک روانشناسی",
     "روانشناس تهران",
-    "مشاوره فوری", 
+    "مشاوره فوری",
     "رزرو نوبت آنلاین",
     "تست روانشناختی رایگان",
     "مشاوره خانوادگی",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     ]
   },
   alternates: {
-    canonical: "https://rozaneh.com"
+    canonical: "https://rozanehclinic.com"
   }
 };
 
@@ -47,8 +47,8 @@ export default function Home() {
         }
         @media (max-width: 767px) {
           .hero-first-section {
-            background-size: 200%;
-            background-position: left 30% top 100%;
+            background-size: 250%;
+            background-position: left 30% top 85%;
           }
         }
         .hero-second-section {
@@ -105,8 +105,8 @@ export default function Home() {
 
         {/* Navigation Menu */}
         {/* Navigation */}
-        <nav className="absolute top-20 md:top-16 right-2 md:right-12 lg:right-20 3xl:right-56 z-10 max-w-[calc(100vw-1rem)]">
-          <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-2 md:px-6 py-2 md:py-3 shadow-sm overflow-x-auto">
+        <nav className="absolute top-25 md:top-16 right-2 md:right-12 lg:right-20 3xl:right-56 z-10 max-w-[calc(100vw-1rem)]">
+          <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-1.5 md:px-6 py-2 md:py-3 shadow-sm overflow-x-auto">
             <ul dir="rtl" className="flex space-x-reverse space-x-2 md:space-x-5 lg:space-x-6 3xl:space-x-9 font-arabic whitespace-nowrap">
               <li>
                 <a href="#home" className="text-gray-700 hover:text-teal-600 font-regular transition-all duration-300 px-2 py-1 md:px-3 md:py-2 3xl:px-8 3xl:py-4 rounded-md text-sm md:text-base 4xl:text-xl inline-block transform hover:scale-110">
@@ -148,7 +148,7 @@ export default function Home() {
         </nav>
 
         {/* Main Content */}
-        <div dir="rtl" className="absolute top-1/2 md:top-120 right-4 md:right-12 lg:right-20 3xl:right-56 transform -translate-y-1/2 text-right max-w-[calc(100vw-2rem)] md:max-w-lg 2xl:max-w-4xl 3xl:max-w-7xl font-arabic px-2">
+        <div dir="rtl" className="absolute top-3/9 md:top-120 right-4 md:right-12 lg:right-20 3xl:right-56 transform -translate-y-1/2 text-right max-w-[calc(100vw-2rem)] md:max-w-lg 2xl:max-w-4xl 3xl:max-w-7xl font-arabic px-2">
           <h1 className="font-bold text-teal-700 mb-3 md:mb-4 3xl:mb-12 leading-tight text-2xl md:text-4xl 4xl:text-6xl text-right">
             سفر شما به سوی سلامت روان
             <br />

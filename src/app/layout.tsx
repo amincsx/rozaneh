@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     "روانشناس",
     "کلینیک روانشناسی",
     "مشاوره خانوادگی",
-    "زوج درمانی", 
+    "زوج درمانی",
     "درمانگر",
     "سلامت روان",
     "مشاوره پیش از ازدواج",
@@ -128,7 +128,7 @@ export default function RootLayout({
         <meta name="application-name" content="کلینیک روزنه" />
         <meta name="msapplication-TileColor" content="#14b8a6" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-        
+
         {/* Schema.org structured data */}
         <script
           type="application/ld+json"
@@ -144,7 +144,7 @@ export default function RootLayout({
               "description": "کلینیک روزنه بهترین مرکز مشاوره آنلاین ایران با خدمات روانشناسی تخصصی",
               "medicalSpecialty": [
                 "Psychology",
-                "Marriage Counseling", 
+                "Marriage Counseling",
                 "Family Therapy",
                 "Mental Health"
               ],
