@@ -273,14 +273,14 @@ export default function TherapistsPage() {
                     {filteredTherapists.map((therapist) => (
                         <div key={therapist.id} className="bg-white/50 backdrop-blur-lg rounded-2xl border border-white/40 shadow-xl overflow-hidden group transform hover:-translate-y-2 transition-transform duration-300">
                             {therapist.image && (
-                                <div className="relative h-48 sm:h-64 md:h-80 w-full overflow-hidden bg-transparent flex items-center justify-center">
+                                <div className="relative h-64 sm:h-64 md:h-80 w-full overflow-hidden bg-transparent flex items-center justify-center">
                                     <svg className="absolute inset-0 w-full h-full z-0" viewBox="0 0 100 100">
                                         <circle cx="50" cy="50" r="45" fill="#24a590ff" opacity="0.4" />
                                     </svg>
                                     <img
                                         src={therapist.image}
                                         alt={therapist.name}
-                                        className="relative z-10 w-48 h-48 sm:w-52 sm:h-52 md:w-140 md:h-140 object-contain group-hover:scale-110 transition-transform duration-500"
+                                        className="relative z-10 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     />
                                 </div>
                             )}

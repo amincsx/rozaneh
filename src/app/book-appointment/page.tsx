@@ -152,7 +152,7 @@ function BookAppointmentContent() {
     const selectedConsultationType = consultationTypes.find(type => type.id === formData.consultationType)
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="container mx-auto px-4 py-8 max-w-4xl overflow-x-hidden">
             <Navbar textColor="gray" />
             {/* Header */}
             <div dir="rtl" className="text-center mb-8 mt-16">
@@ -289,7 +289,7 @@ function BookAppointmentContent() {
                             <h3 className="font-semibold text-gray-900 mb-3 font-arabic">
                                 انتخاب تاریخ
                             </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                                 {availableDates.map((date) => {
                                     const dateObj = new Date(date)
                                     const persianDate = new Intl.DateTimeFormat('fa-IR', {
@@ -320,7 +320,7 @@ function BookAppointmentContent() {
                                 <h3 className="font-semibold text-gray-900 mb-3 font-arabic">
                                     انتخاب ساعت
                                 </h3>
-                                <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                                <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
                                     {timeSlots.map((time) => (
                                         <button
                                             key={time}
