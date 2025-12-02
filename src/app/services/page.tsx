@@ -64,11 +64,11 @@ export default function ServicesPage() {
         <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50">
             <div className="relative">
                 {/* SVG - Absolute positioned on left */}
-                <div className="hidden lg:flex items-start justify-center pt-8 px-4 absolute left-0 top-0 h-screen w-1/2">
+                <div className="hidden lg:flex items-start justify-center pt-8 px-4 absolute left-0 -top-35 h-screen w-1/2">
                     <img
                         src="/services 1.svg"
                         alt="Services"
-                        className="w-full h-150 max-w-lg object-contain"
+                        className="w-full h-150 max-w-sm object-contain scale-70"
                     />
                 </div>
 
@@ -91,7 +91,7 @@ export default function ServicesPage() {
                     </div>
 
                     {/* Hero Section */}
-                    <section dir="rtl" className="pt-8 pb-8 px-6">
+                    <section dir="rtl" className="pt-4 pb-4 px-6">
                         <div className="text-right">
                             <h1 className="font-bold text-teal-700 mb-3 leading-tight text-2xl md:text-3xl">
                                 خدمات روانشناسی و مشاوره
@@ -102,8 +102,8 @@ export default function ServicesPage() {
                         </div>
                     </section>
 
-                    {/* Spacer to move content below SVG */}
-                    <section className="py-48"></section>
+                    {/* Spacer reduced for mobile, larger for desktop */}
+                    <section className="py-8 lg:py-24"></section>
 
                     {/* Services Grid - Section 1 */}
                     <section dir="rtl" className="px-6">

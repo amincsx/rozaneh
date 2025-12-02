@@ -23,6 +23,16 @@ export const metadata: Metadata = {
   title: "روزنه - بهترین پلتفرم مشاوره آنلاین ایران",
   description: "کلینیک روزنه - ارائه خدمات مشاوره و روانشناسی آنلاین با بهترین متخصصان ایران",
   keywords: "مشاوره آنلاین، روانشناس، درمانگر، سلامت روان، کلینیک روزنه",
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/logo.svg', type: 'image/svg+xml' }
+    ],
+    apple: [
+      { url: '/logo.svg', sizes: '180x180', type: 'image/svg+xml' }
+    ]
+  },
+  manifest: '/manifest.json'
 };
 
 export default function RootLayout({
@@ -32,6 +42,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#acd5d4" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${ibmPlexSansArabic.variable} antialiased`}
       >

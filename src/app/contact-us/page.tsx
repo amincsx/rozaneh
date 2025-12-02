@@ -6,12 +6,12 @@ export default function ContactUsPage() {
   return (
     <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50">
       <div className="relative">
-        {/* SVG - Absolute positioned on left */}
-        <div className="hidden lg:flex items-start justify-center pt-8 px-4 absolute left-10 top-0 h-screen w-1/2 ">
+        {/* SVG - Hidden on mobile, shown on desktop positioned left */}
+        <div className="hidden lg:flex items-start justify-center pt-8 px-4 absolute left-10 top-48 h-screen w-1/3">
           <img
             src="/contact us.svg"
             alt="Contact Us"
-            className="w-full max-w-xs object-contain"
+            className="w-full max-w-sm object-contain scale-75"
           />
         </div>
 
@@ -45,14 +45,14 @@ export default function ContactUsPage() {
             </div>
           </section>
 
-          {/* Spacer to move content below SVG */}
-          <section className="py-48"></section>
+          {/* Spacer only for desktop */}
+          <section className="hidden lg:block py-12"></section>
 
           {/* Contact Information */}
           <section dir="rtl" className="px-6 pb-8">
             <div className="grid grid-cols-1 gap-6">
               {/* Address */}
-              <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-4 shadow-sm">
+              <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-4 shadow-sm lg:w-1/2">
                 <div className="flex items-start gap-4">
                   <div className="text-2xl">📍</div>
                   <div className="flex-1">
@@ -76,7 +76,7 @@ export default function ContactUsPage() {
               </div>
 
               {/* Phone Numbers */}
-              <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-4 shadow-sm">
+              <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-4 shadow-sm lg:w-1/2">
                 <div className="flex items-start gap-4">
                   <div className="text-2xl">📞</div>
                   <div className="w-full">
@@ -96,7 +96,7 @@ export default function ContactUsPage() {
               </div>
 
               {/* Email */}
-              <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-4 shadow-sm">
+              <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-4 shadow-sm lg:w-1/2">
                 <div className="flex items-start gap-4">
                   <div className="text-2xl">📧</div>
                   <div>

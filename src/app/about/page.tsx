@@ -5,21 +5,23 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Users, Heart } from "lucide-react";
-import Navbar from "@/components/Navbar";
 
 export default function AboutPage() {
     const router = useRouter();
 
     return (
-        <main className="min-h-screen bg-slate-50 font-farsi selection:bg-teal-100 selection:text-teal-900">
-            {/* Navigation Bar */}
-            <Navbar />
-
+        <main className="min-h-screen bg-slate-50 font-farsi selection:bg-teal-100 selection:text-teal-900 overflow-x-hidden w-full">
             {/* Hero Section */}
-            <section className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden">
+            <section className="relative w-full h-[50vh] md:h-[80vh] flex items-center justify-center overflow-hidden">
+                {/* Back Button */}
+                <div className="absolute top-6 right-6 z-20">
+                    <Link href="/" className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 text-white font-light px-4 py-2 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm">
+                        بازگشت به صفحه اصلی
+                    </Link>
+                </div>
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src="/rozaneh pics/1.jpg"
+                        src="/rozaneh pics/1.webp"
                         alt="Rozaneh Clinic Interior"
                         fill
                         className="object-cover brightness-[0.85]"
@@ -39,14 +41,14 @@ export default function AboutPage() {
             </section>
 
             {/* Our Story Section */}
-            <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <section className="py-8 md:py-24 px-3 md:px-6 lg:px-12 max-w-7xl mx-auto w-full">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
                     <div className="order-2 lg:order-1 relative">
                         <div className="absolute -top-10 -left-10 w-40 h-40 bg-teal-100 rounded-full blur-3xl opacity-50" />
                         <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-50" />
 
-                        <h2 className="text-4xl font-bold text-slate-800 mb-8 relative z-10">داستان ما</h2>
-                        <div className="space-y-6 text-lg text-slate-600 leading-loose text-justify relative z-10">
+                        <h2 className="text-2xl md:text-4xl font-bold text-slate-800 mb-6 md:mb-8 relative z-10">داستان ما</h2>
+                        <div className="space-y-4 md:space-y-6 text-base md:text-lg text-slate-600 leading-relaxed md:leading-loose text-justify relative z-10">
                             <p>
                                 کلینیک روانشناختی روزنه در سال ۱۳۹۷ با هدف ایجاد فضایی امن، حرفه‌ای و مبتنی بر اصول سلامت روان تأسیس شد. داستان شکل‌گیری این کلینیک به دوران تدریس دکتر محمدی در دانشگاه علامه طباطبایی بازمی‌گردد؛ جایی که در گفت‌وگویی الهام‌بخش با یکی از دانشجویان برجسته، دکتر امینیان، ایده اولیه آن شکل گرفت.
                             </p>
@@ -55,9 +57,9 @@ export default function AboutPage() {
                             </p>
                         </div>
                     </div>
-                    <div className="order-1 lg:order-2 relative h-[500px] w-full rounded-3xl overflow-hidden shadow-2xl rotate-2 hover:rotate-0 transition-all duration-500">
+                    <div className="order-1 lg:order-2 relative h-[200px] md:h-[500px] w-full rounded-lg md:rounded-3xl overflow-hidden shadow-2xl rotate-1 lg:rotate-2 hover:rotate-0 transition-all duration-500">
                         <Image
-                            src="/rozaneh pics/2.jpg"
+                            src="/rozaneh pics/2.webp"
                             alt="Therapy Session"
                             fill
                             className="object-cover"
@@ -67,7 +69,7 @@ export default function AboutPage() {
             </section>
 
             {/* Values Section */}
-            <section className="relative py-80 px-12 overflow-hidden">
+            <section className="relative py-12 md:py-24 lg:py-40 px-3 md:px-8 lg:px-12 overflow-hidden w-full">
                 {/* Background SVG */}
                 <div className="absolute inset-0 z-0">
                     <Image
@@ -80,12 +82,12 @@ export default function AboutPage() {
                 </div>
 
                 <div className="relative z-10 max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-3">ارزش‌های بنیادین ما</h2>
-                        <p className="text-slate-500 text-lg font-light">آنچه روزنه را متمایز می‌کند</p>
+                    <div className="text-center mb-8 md:mb-12">
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-800 mb-3">ارزش‌های بنیادین ما</h2>
+                        <p className="text-slate-500 text-base md:text-lg font-light">آنچه روزنه را متمایز می‌کند</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                         {[
                             {
 
@@ -118,31 +120,31 @@ export default function AboutPage() {
             </section>
 
             {/* Gallery / Atmosphere Section */}
-            <section className="py-24 px-6 max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[600px]">
-                    <div className="relative rounded-3xl overflow-hidden shadow-lg group">
+            <section className="py-8 md:py-24 px-3 md:px-6 max-w-7xl mx-auto w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 h-auto md:h-[600px]">
+                    <div className="relative rounded-lg md:rounded-3xl overflow-hidden shadow-lg group h-40 md:h-full">
                         <Image
-                            src="/rozaneh pics/3.jpg"
+                            src="/rozaneh pics/3.webp"
                             alt="Clinic Atmosphere"
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-700"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
-                            <p className="text-white text-xl font-medium">محیطی آرام برای گفتگو</p>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 md:p-8">
+                            <p className="text-white text-lg md:text-xl font-medium">محیطی آرام برای گفتگو</p>
                         </div>
                     </div>
-                    <div className="grid grid-rows-2 gap-8">
-                        <div className="relative rounded-3xl overflow-hidden shadow-lg group">
+                    <div className="grid grid-rows-2 gap-4 md:gap-8 h-auto md:h-full">
+                        <div className="relative rounded-lg md:rounded-3xl overflow-hidden shadow-lg group h-24 md:h-full">
                             <Image
-                                src="/rozaneh pics/4.jpg"
+                                src="/rozaneh pics/4.webp"
                                 alt="Clinic Detail"
                                 fill
                                 className="object-cover group-hover:scale-105 transition-transform duration-700"
                             />
                         </div>
-                        <div className="relative rounded-3xl overflow-hidden shadow-lg group">
+                        <div className="relative rounded-lg md:rounded-3xl overflow-hidden shadow-lg group h-20 md:h-full">
                             <Image
-                                src="/rozaneh pics/5.jpg"
+                                src="/rozaneh pics/5.webp"
                                 alt="Clinic Detail"
                                 fill
                                 className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -153,7 +155,7 @@ export default function AboutPage() {
             </section>
 
             {/* Footer */}
-            <footer className="w-full py-4 px-6 mt-4 pb-20">
+            <footer className="w-full py-4 px-3 md:px-6 mt-4 pb-20 overflow-x-hidden">
                 <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm flex flex-col items-center gap-3 px-4 py-4">
                     <div className="flex items-center gap-2">
                         <img src="/logo.svg" alt="Rozaneh Logo" className="w-8 h-8" />

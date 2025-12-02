@@ -55,16 +55,16 @@ export default function TherapistDashboardPage() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 mb-8">
-                    <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-6 text-center shadow-sm">
-                        <div className="text-3xl font-bold text-teal-700">۲۳</div>
+                    <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-8 text-center shadow-sm">
+                        <div className="text-4xl font-bold text-teal-700">۲۳</div>
                         <div className="text-gray-600 mt-2">کاربران فعال</div>
                     </div>
-                    <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-6 text-center shadow-sm">
-                        <div className="text-3xl font-bold text-teal-700">۱۵۰</div>
+                    <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-8 text-center shadow-sm">
+                        <div className="text-4xl font-bold text-teal-700">۱۵۰</div>
                         <div className="text-gray-600 mt-2">آزمون‌های انجام شده</div>
                     </div>
-                    <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-6 text-center shadow-sm">
-                        <div className="text-3xl font-bold text-orange-600">۳</div>
+                    <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-8 text-center shadow-sm">
+                        <div className="text-4xl font-bold text-orange-600">۳</div>
                         <div className="text-gray-600 mt-2">درخواست منتظر</div>
                     </div>
                 </div>

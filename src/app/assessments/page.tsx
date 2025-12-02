@@ -66,7 +66,7 @@ export default function AssessmentsPage() {
                     <img
                         src="/assesment.svg"
                         alt="Assessment"
-                        className="w-full max-w-lg object-contain"
+                        className="w-full max-w-sm object-contain scale-100"
                     />
                 </div>
 
@@ -89,7 +89,7 @@ export default function AssessmentsPage() {
                     </div>
 
                     {/* Hero Section */}
-                    <section dir="rtl" className="pt-8 pb-8 px-6">
+                    <section dir="rtl" className="pt-4 pb-4 px-6">
                         <div className="text-right">
                             <h1 className="font-bold text-teal-700 mb-3 leading-tight text-2xl md:text-3xl">
                                 آزمون‌های روانشناختی تخصصی
@@ -100,8 +100,8 @@ export default function AssessmentsPage() {
                         </div>
                     </section>
 
-                    {/* Spacer to move content below SVG */}
-                    <section className="py-32"></section>
+                    {/* Spacer reduced for mobile, larger for desktop */}
+                    <section className="py-8 lg:py-32"></section>
 
                     {/* Assessments Grid - Section 1 */}
                     <section dir="rtl" className="px-6">

@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Phone, CheckCircle, ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import Navbar from "@/components/Navbar"
 
 export default function ChatSupportPage() {
     const [phoneNumber, setPhoneNumber] = useState("")
@@ -48,8 +47,6 @@ export default function ChatSupportPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-blue-50">
-            <Navbar textColor="gray" />
-
             <div className="container mx-auto px-4 py-16 max-w-2xl">
                 {/* Back Button */}
                 <Link
