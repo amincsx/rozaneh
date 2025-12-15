@@ -1,51 +1,103 @@
 "use client"
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import EditProfileModal from "@/components/EditProfileModal";
+import PersianCalendar from "@/components/PersianCalendar";
+
+interface User {
+    user_id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    city?: string;
+    address?: string;
+    date_of_birth?: string;
+    gender?: string;
+    bio?: string;
+    profile_picture?: string;
+    registration_date?: string;
+    [key: string]: string | undefined;
+}
+
+interface Appointment {
+    id: string;
+    therapist: string;
+    date: string;
+    time: string;
+    status: string;
+    type: string;
+}
+
+interface Test {
+    id: string;
+    name: string;
+    date: string;
+    result: string;
+    status: string;
+}
 
 export default function UserDashboard() {
-    const [user] = useState({
-        name: "احمد محمدی",
-        email: "ahmad@example.com",
-        phone: "09123456789",
-        joinDate: "1402/05/15"
-    });
+    const [user, setUser] = useState<User | null>(null);
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [tests, setTests] = useState<Test[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    const [appointments] = useState([
-        {
-            id: 1,
-            therapist: "دکتر زهرا احمدی",
-            date: "1402/09/20",
-            time: "14:00",
-            status: "confirmed",
-            type: "مشاوره فردی"
-        },
-        {
-            id: 2,
-            therapist: "دکتر علی رضایی",
-            date: "1402/09/15",
-            time: "16:30",
-            status: "completed",
-            type: "مشاوره زوجی"
-        }
-    ]);
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
 
-    const [tests] = useState([
-        {
-            id: 1,
-            name: "آزمون شخصیت MBTI",
-            date: "1402/09/10",
-            result: "INFP - میانجی",
-            status: "completed"
-        },
-        {
-            id: 2,
-            name: "آزمون افسردگی بک",
-            date: "1402/09/05",
-            result: "امتیاز: 8 (خفیف)",
-            status: "completed"
-        }
-    ]);
+                // Get user_id or email from localStorage (set during login)
+                const user_id = localStorage.getItem('user_id');
+                const email = localStorage.getItem('email');
+
+                if (!user_id && !email) {
+                    setError('لطفا ابتدا وارد حساب کاربری شوید');
+                    window.location.href = '/auth/signin';
+                    return;
+                }
+
+                console.log('[Dashboard] Fetching user data:', { user_id, email });
+
+                // Fetch user profile
+                const profileUrl = new URL('/api/auth/user-profile', window.location.origin);
+                if (user_id) profileUrl.searchParams.append('user_id', user_id);
+                if (email) profileUrl.searchParams.append('email', email);
+
+                const profileResponse = await fetch(profileUrl.toString());
+                if (!profileResponse.ok) {
+                    throw new Error('خطا در بارگذاری اطلاعات کاربر');
+                }
+
+                const profileData = await profileResponse.json();
+                if (!profileData.success || !profileData.user) {
+                    throw new Error('اطلاعات کاربر یافت نشد');
+                }
+
+                console.log('[Dashboard] User data loaded:', profileData.user);
+                setUser(profileData.user);
+
+                // TODO: Fetch appointments from database when appointments API is ready
+                // For now, show empty array
+                setAppointments([]);
+
+                // TODO: Fetch test results from database when assessments API is ready
+                // For now, show empty array
+                setTests([]);
+            } catch (err) {
+                console.error('[Dashboard] Error:', err);
+                setError(err instanceof Error ? err.message : 'خطای نامشخص');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -64,6 +116,43 @@ export default function UserDashboard() {
             default: return 'نامشخص';
         }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">درحال بارگذاری...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 flex items-center justify-center">
+                <div className="text-center bg-red-50 p-6 rounded-lg max-w-md">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <Link href="/auth/signin" className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                        بازگشت به صفحه ورود
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-gray-600 mb-4">اطلاعات کاربر بارگذاری نشد</p>
+                    <Link href="/auth/signin" className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700">
+                        بازگشت به صفحه ورود
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50">
@@ -85,7 +174,9 @@ export default function UserDashboard() {
                         {/* Logout Button */}
                         <button
                             onClick={() => {
-                                // Clear any stored session data here
+                                // Clear stored session data
+                                localStorage.removeItem('user_id');
+                                localStorage.removeItem('email');
                                 window.location.href = '/';
                             }}
                             className="bg-red-500/80 backdrop-blur-sm border border-red-300/30 text-white font-light px-4 py-2 rounded-lg transition-all duration-300 hover:bg-red-600/90 hover:scale-105 shadow-sm text-sm"
@@ -102,7 +193,7 @@ export default function UserDashboard() {
                             داشبورد کاربری
                         </h1>
                         <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                            خوش آمدید {user.name} - مدیریت نوبت‌ها، آزمون‌ها و پروفایل شخصی
+                            خوش آمدید {user?.name || 'کاربر'} - مدیریت نوبت‌ها، آزمون‌ها و پروفایل شخصی
                         </p>
                     </div>
                 </section>
@@ -120,11 +211,11 @@ export default function UserDashboard() {
                                 <div className="text-gray-600 text-sm">آزمون‌های انجام شده</div>
                             </div>
                             <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-4 shadow-sm text-center">
-                                <div className="text-2xl font-bold text-teal-700 mb-2">1</div>
+                                <div className="text-2xl font-bold text-teal-700 mb-2">0</div>
                                 <div className="text-gray-600 text-sm">نوبت آینده</div>
                             </div>
                             <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-4 shadow-sm text-center">
-                                <div className="text-2xl font-bold text-teal-700 mb-2">98%</div>
+                                <div className="text-2xl font-bold text-teal-700 mb-2">-</div>
                                 <div className="text-gray-600 text-sm">رضایت کلی</div>
                             </div>
                         </div>
@@ -147,14 +238,35 @@ export default function UserDashboard() {
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-500">موبایل:</span>
-                                        <span className="font-medium text-gray-700" dir="ltr">{user.phone}</span>
+                                        <span className="font-medium text-gray-700" dir="ltr">{user.phone || '-'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">شهر:</span>
+                                        <span className="font-medium text-gray-700">{user.city || '-'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">تاریخ تولد:</span>
+                                        <span className="font-medium text-gray-700">
+                                            {user.date_of_birth
+                                                ? new Date(user.date_of_birth).toLocaleDateString('fa-IR')
+                                                : '-'
+                                            }
+                                        </span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-500">تاریخ عضویت:</span>
-                                        <span className="font-medium text-gray-700">{user.joinDate}</span>
+                                        <span className="font-medium text-gray-700">
+                                            {user.registration_date
+                                                ? new Date(user.registration_date).toLocaleDateString('fa-IR')
+                                                : '-'
+                                            }
+                                        </span>
                                     </div>
                                 </div>
-                                <button className="w-full mt-6 bg-teal-600 text-white py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm">
+                                <button
+                                    onClick={() => setIsEditModalOpen(true)}
+                                    className="w-full mt-6 bg-teal-600 text-white py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm"
+                                >
                                     ویرایش پروفایل
                                 </button>
                             </div>
@@ -177,6 +289,11 @@ export default function UserDashboard() {
                                     </Link>
                                 </div>
                             </div>
+
+                            {/* Persian Calendar */}
+                            <div className="mt-4 lg:mt-0">
+                                <PersianCalendar />
+                            </div>
                         </div>
                     </section>
 
@@ -184,31 +301,35 @@ export default function UserDashboard() {
                     <section dir="rtl" className="mb-8">
                         <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-6 shadow-sm">
                             <h2 className="text-xl font-bold text-teal-700 mb-6">نوبت‌های شما</h2>
-                            <div className="space-y-4">
-                                {appointments.map((appointment) => (
-                                    <div key={appointment.id} className="bg-white/30 backdrop-blur-sm border border-white/40 rounded-lg p-4 shadow-sm">
-                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                            <div className="flex-1">
-                                                <h3 className="font-bold text-gray-800">{appointment.therapist}</h3>
-                                                <p className="text-gray-600 text-sm">{appointment.type}</p>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <div className="text-center">
-                                                    <div className="text-sm text-gray-600">تاریخ</div>
-                                                    <div className="font-medium">{appointment.date}</div>
+                            {appointments.length === 0 ? (
+                                <p className="text-gray-600 text-center py-8">هنوز نوبتی رزرو نشده است</p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {appointments.map((appointment) => (
+                                        <div key={appointment.id} className="bg-white/30 backdrop-blur-sm border border-white/40 rounded-lg p-4 shadow-sm">
+                                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                                <div className="flex-1">
+                                                    <h3 className="font-bold text-gray-800">{appointment.therapist}</h3>
+                                                    <p className="text-gray-600 text-sm">{appointment.type}</p>
                                                 </div>
-                                                <div className="text-center">
-                                                    <div className="text-sm text-gray-600">ساعت</div>
-                                                    <div className="font-medium">{appointment.time}</div>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="text-center">
+                                                        <div className="text-sm text-gray-600">تاریخ</div>
+                                                        <div className="font-medium">{appointment.date}</div>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <div className="text-sm text-gray-600">ساعت</div>
+                                                        <div className="font-medium">{appointment.time}</div>
+                                                    </div>
+                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
+                                                        {getStatusText(appointment.status)}
+                                                    </span>
                                                 </div>
-                                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
-                                                    {getStatusText(appointment.status)}
-                                                </span>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </section>
 
@@ -216,27 +337,31 @@ export default function UserDashboard() {
                     <section dir="rtl" className="mb-8">
                         <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-6 shadow-sm">
                             <h2 className="text-xl font-bold text-teal-700 mb-6">نتایج آزمون‌ها</h2>
-                            <div className="space-y-4">
-                                {tests.map((test) => (
-                                    <div key={test.id} className="bg-white/30 backdrop-blur-sm border border-white/40 rounded-lg p-4 shadow-sm">
-                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                            <div className="flex-1">
-                                                <h3 className="font-bold text-gray-800">{test.name}</h3>
-                                                <p className="text-gray-600 text-sm">تاریخ انجام: {test.date}</p>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <div className="text-center">
-                                                    <div className="text-sm text-gray-600">نتیجه</div>
-                                                    <div className="font-medium">{test.result}</div>
+                            {tests.length === 0 ? (
+                                <p className="text-gray-600 text-center py-8">هنوز آزمونی انجام نشده است</p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {tests.map((test) => (
+                                        <div key={test.id} className="bg-white/30 backdrop-blur-sm border border-white/40 rounded-lg p-4 shadow-sm">
+                                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                                <div className="flex-1">
+                                                    <h3 className="font-bold text-gray-800">{test.name}</h3>
+                                                    <p className="text-gray-600 text-sm">تاریخ انجام: {test.date}</p>
                                                 </div>
-                                                <button className="bg-teal-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors text-sm shadow-sm">
-                                                    مشاهده جزئیات
-                                                </button>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="text-center">
+                                                        <div className="text-sm text-gray-600">نتیجه</div>
+                                                        <div className="font-medium">{test.result}</div>
+                                                    </div>
+                                                    <button className="bg-teal-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors text-sm shadow-sm">
+                                                        مشاهده جزئیات
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </section>
 
@@ -260,6 +385,14 @@ export default function UserDashboard() {
                     </footer>
                 </div>
             </div>
+
+            {/* Edit Profile Modal */}
+            <EditProfileModal
+                user={user}
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onUpdate={(updatedUser) => setUser(updatedUser)}
+            />
         </div>
     );
 }

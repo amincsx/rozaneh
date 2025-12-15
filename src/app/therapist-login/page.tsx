@@ -1,45 +1,112 @@
+"use client"
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function TherapistLoginPage() {
+    const [therapistId, setTherapistId] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const router = useRouter();
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch('/api/auth/therapist-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    therapist_id: therapistId,
+                    password: password
+                }),
+            });
+
+            const data = await response.json();
+            console.log('Login response:', data);
+
+            if (data.success) {
+                // Store login state and therapist data with string key
+                const idString = String(therapistId);
+                console.log(`Setting localStorage for therapist ${idString}`);
+                localStorage.setItem(`therapist_${idString}_logged_in`, 'true');
+                localStorage.setItem(`therapist_${idString}_data`, JSON.stringify(data.therapist));
+
+                // Verify storage
+                console.log(`Verification - logged_in:`, localStorage.getItem(`therapist_${idString}_logged_in`));
+                console.log(`Verification - data:`, localStorage.getItem(`therapist_${idString}_data`));
+
+                // Redirect to individual dashboard
+                console.log(`Redirecting to /therapist-dashboard/${idString}`);
+                router.push(`/therapist-dashboard/${idString}`);
+            } else {
+                setError(data.message || 'خطا در ورود');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            setError('خطا در اتصال به سرور');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 flex items-center justify-center px-6">
+        <div className="min-h-screen bg-gradient-to-br from-teal-600 to-green-600 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <img src="/logo.svg" alt="Rozaneh Logo" className="w-16 h-16 object-contain mx-auto mb-2" />
-                    <h1 className="text-3xl font-bold text-teal-700">کلینیک روزنه</h1>
-                    <p className="text-gray-600 mt-2">ورود مشاور</p>
-                </div>
+                <div className="bg-white rounded-lg shadow-xl p-8">
+                    <h1 className="text-2xl font-bold text-center text-gray-800 mb-8">ورود درمانگران</h1>
 
-                {/* Login Form */}
-                <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-8 shadow-sm mb-6">
-                    <form className="space-y-4">
+                    <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label className="block text-right text-gray-700 font-medium mb-2">شناسه مشاور</label>
-                            <input type="text" className="w-full px-4 py-2 border border-white/30 rounded-lg bg-white/50 text-gray-800 placeholder-gray-500 focus:outline-none focus:bg-white/70 transition" placeholder="شناسه خود را وارد کنید" />
+                            <input
+                                type="number"
+                                min="1"
+                                max="20"
+                                value={therapistId}
+                                onChange={(e) => setTherapistId(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-center"
+                                placeholder="شناسه"
+                                required
+                            />
                         </div>
 
                         <div>
-                            <label className="block text-right text-gray-700 font-medium mb-2">رمز عبور</label>
-                            <input type="password" className="w-full px-4 py-2 border border-white/30 rounded-lg bg-white/50 text-gray-800 placeholder-gray-500 focus:outline-none focus:bg-white/70 transition" placeholder="رمز عبور خود را وارد کنید" />
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                placeholder="رمز عبور"
+                                required
+                            />
                         </div>
 
-                        <button type="submit" className="w-full bg-teal-600 text-white py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm mt-6">
-                            ورود
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded">
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-teal-600 text-white py-3 rounded-lg font-semibold hover:bg-teal-700 disabled:bg-gray-400 transition"
+                        >
+                            {loading ? 'در حال ورود...' : 'ورود'}
                         </button>
                     </form>
-                </div>
 
-                {/* Links */}
-                <div className="text-center space-y-3">
-                    <p className="text-gray-700">
-                        <Link href="/login" className="text-teal-600 font-medium hover:underline">
-                            ورود کاربر عادی
+                    <div className="mt-6 text-center">
+                        <Link href="/" className="text-teal-600 hover:text-teal-700 text-sm">
+                            بازگشت
                         </Link>
-                    </p>
-                    <Link href="/" className="block text-teal-600 font-medium hover:underline">
-                        بازگشت به صفحه اصلی
-                    </Link>
+                    </div>
                 </div>
             </div>
         </div>

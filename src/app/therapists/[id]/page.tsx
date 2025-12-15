@@ -24,10 +24,15 @@ interface Therapist {
 
 interface Comment {
     id: string
-    author: string
-    text: string
+    userName: string
+    userEmail?: string
+    therapistId: string
+    message: string
     rating: number
-    date: string
+    reply?: string
+    isReplied: boolean
+    status: string
+    createdAt: string
 }
 
 const mockTherapists: Therapist[] = [
@@ -197,32 +202,80 @@ export default function TherapistProfilePage() {
         const found = mockTherapists.find(t => t.id === therapistId)
         if (found) {
             setTherapist(found)
-            // Load saved comments from localStorage
-            const savedComments = localStorage.getItem(`therapist-${therapistId}-comments`)
-            if (savedComments) {
-                setComments(JSON.parse(savedComments))
-            }
+            // Load comments from database
+            fetchComments()
         }
     }, [therapistId])
 
-    const handleSubmitComment = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!newComment.author.trim() || !newComment.text.trim()) return
+    const fetchComments = async () => {
+        try {
+            const response = await fetch(`/api/comments?therapistId=${therapistId}`)
+            const data = await response.json()
+            if (data.success) {
+                setComments(data.comments || [])
+            }
+        } catch (error) {
+            console.error('Error loading comments:', error)
+        }
+    }
 
-        const comment: Comment = {
-            id: Date.now().toString(),
-            author: newComment.author,
-            text: newComment.text,
-            rating: newComment.rating,
-            date: new Date().toLocaleDateString('fa-IR')
+    const handleSubmitComment = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        // Detailed validation
+        if (!newComment.author || !newComment.author.trim()) {
+            alert('لطفاً نام خود را وارد کنید')
+            return
         }
 
-        const updatedComments = [comment, ...comments]
-        setComments(updatedComments)
-        localStorage.setItem(`therapist-${therapistId}-comments`, JSON.stringify(updatedComments))
+        if (!newComment.text || !newComment.text.trim()) {
+            alert('لطفاً پیام خود را وارد کنید')
+            return
+        }
 
-        setNewComment({ author: "", text: "", rating: 5 })
-        setShowCommentForm(false)
+        if (!therapistId) {
+            alert('خطا: شناسه مشاور یافت نشد')
+            return
+        }
+
+        try {
+            const payload = {
+                therapist_id: therapistId,
+                user_name: newComment.author.trim(),
+                message: newComment.text.trim(),
+                rating: newComment.rating || 5
+            }
+            console.log('=== Comment Submission ===')
+            console.log('Therapist ID:', therapistId)
+            console.log('Author:', newComment.author.trim())
+            console.log('Message:', newComment.text.trim())
+            console.log('Rating:', newComment.rating)
+            console.log('Full payload:', JSON.stringify(payload))
+
+            const response = await fetch('/api/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+
+            const data = await response.json()
+            console.log('Comment response:', data, 'Status:', response.status)
+
+            if (data.success) {
+                // Refresh comments list
+                fetchComments()
+                setNewComment({ author: "", text: "", rating: 5 })
+                setShowCommentForm(false)
+                alert('نظر شما با موفقیت ثبت شد')
+            } else {
+                alert(data.message || 'خطا در ثبت نظر')
+            }
+        } catch (error) {
+            console.error('Error submitting comment:', error)
+            alert('خطا در ارسال نظر')
+        }
     }
 
     if (!therapist) {
@@ -447,7 +500,7 @@ export default function TherapistProfilePage() {
                                                     <User className="w-5 h-5 text-teal-600" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-semibold text-slate-800 font-farsi">{comment.author}</h4>
+                                                    <h4 className="font-semibold text-slate-800 font-farsi">{comment.userName}</h4>
                                                     <div className="flex items-center gap-1 mt-1">
                                                         {[1, 2, 3, 4, 5].map((rating) => (
                                                             <Star
@@ -463,10 +516,21 @@ export default function TherapistProfilePage() {
                                             </div>
                                             <div className="flex items-center gap-2 text-sm text-slate-500 font-farsi">
                                                 <Clock className="w-4 h-4" />
-                                                <span>{comment.date}</span>
+                                                {/* Use a date formatter or simple toLocaleString */}
+                                                <span>{new Date(comment.createdAt).toLocaleDateString('fa-IR')}</span>
                                             </div>
                                         </div>
-                                        <p className="text-slate-700 leading-relaxed font-farsi">{comment.text}</p>
+                                        <p className="text-slate-700 leading-relaxed font-farsi">{comment.message}</p>
+
+                                        {comment.reply && (
+                                            <div className="mt-4 mr-8 p-4 bg-teal-50 border-r-2 border-teal-500 rounded-l-lg">
+                                                <div className="flex items-center gap-2 mb-2 text-teal-700 font-semibold text-sm">
+                                                    <User className="w-4 h-4" />
+                                                    <span>پاسخ مشاور</span>
+                                                </div>
+                                                <p className="text-slate-600 text-sm leading-relaxed">{comment.reply}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 ))
                             )}

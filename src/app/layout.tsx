@@ -1,24 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
-  variable: "--font-ibm-plex-sans-arabic",
-  subsets: ["arabic"],
-  weight: ["100", "200", "300", "400", "500", "600", "700"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://rozanehclinic.com'),
@@ -90,10 +73,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico' },
+      { url: '/logo.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico?v=1' },
       { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
-      { url: '/logo.svg', type: 'image/svg+xml' }
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' }
     ],
     apple: [
       { url: '/icon-192.png', sizes: '192x192', type: 'image/png' }
@@ -116,10 +99,10 @@ export default function RootLayout({
         <GoogleAnalytics gaId="GA_MEASUREMENT_ID" />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
-        <link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico?v=1" sizes="any" />
+        <link rel="shortcut icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icon-192.png?v=1" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#14b8a6" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -169,9 +152,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${ibmPlexSansArabic.variable} antialiased`}
-      >
+      <body className="antialiased">
         <Providers>
           <div className="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-blue-50">
             <main>{children}</main>

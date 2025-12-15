@@ -247,53 +247,6 @@ export default function AssessmentsPage() {
                         </div>
                     </section>
 
-                    {/* How it Works Section */}
-                    <section dir="rtl" className="py-8 px-6">
-                        <div>
-                            <h2 className="text-xl md:text-2xl font-bold text-teal-700 text-center mb-8">مراحل انجام آزمون</h2>
-                            <div className="grid grid-cols-2 gap-4">
-                                {[
-                                    { step: "۱", title: "انتخاب آزمون", desc: "با مشاوره متخصص، آزمون مناسب انتخاب می‌شود" },
-                                    { step: "۲", title: "رزرو نوبت", desc: "زمان مناسب برای انجام آزمون تعیین می‌شود" },
-                                    { step: "۳", title: "اجرای آزمون", desc: "آزمون توسط روانشناس مجرب اجرا می‌شود" },
-                                    { step: "۴", title: "تفسیر نتایج", desc: "گزارش کامل همراه با توضیحات ارائه می‌شود" }
-                                ].map((item, index) => (
-                                    <div key={index} className="text-center p-3">
-                                        <div className="w-10 h-10 bg-white/30 backdrop-blur-sm border border-white/40 text-teal-700 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-2 shadow-sm">
-                                            {item.step}
-                                        </div>
-                                        <h3 className="text-sm font-bold text-teal-700 mb-1">{item.title}</h3>
-                                        <p className="text-gray-600 text-xs leading-relaxed">{item.desc}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* CTA Section */}
-                    <section dir="rtl" className="py-8 px-6">
-                        <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-6 text-center shadow-sm">
-                            <h2 className="text-lg md:text-xl font-bold text-teal-700 mb-3">نیاز به مشاوره برای انتخاب آزمون دارید؟</h2>
-                            <p className="text-gray-600 mb-6 text-sm">
-                                متخصصین ما به شما کمک می‌کنند آزمون مناسب با نیازهایتان را انتخاب کنید.
-                            </p>
-                            <div className="flex flex-col gap-3">
-                                <Link
-                                    href="/book-appointment"
-                                    className="bg-teal-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm text-sm"
-                                >
-                                    رزرو نوبت ارزیابی
-                                </Link>
-                                <Link
-                                    href="/contact-us"
-                                    className="bg-white/30 backdrop-blur-sm border border-white/40 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-white/40 transition-colors text-sm"
-                                >
-                                    مشاوره رایگان
-                                </Link>
-                            </div>
-                        </div>
-                    </section>
-
                     {/* Footer */}
                     <footer className="w-full py-4 px-6 mt-4 pb-20">
                         <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm flex flex-col items-center gap-3 px-4 py-4">

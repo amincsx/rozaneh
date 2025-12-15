@@ -52,18 +52,18 @@ export default function Home() {
           }
         }
         .hero-second-section {
-          background-image: none;
+          background-image: url(/bg%202-01.svg);
+          background-size: 120%;
+          background-position: center top ;
+          background-repeat: no-repeat;
+          margin-top: 0px ;
         }
-        @media (min-width: 1024px) {
-          .hero-second-section {
-            background-image: url(/bg%202-01.svg);
-          }
-        }
-        @media (max-width: 767px) {
+        @media (max-width: 1023px) {
           .hero-second-section {
             background-image: none;
             padding-bottom: 400px;
             margin-bottom: 30px;
+            margin-top: 0;
           }
         }
         .hero-third-section {

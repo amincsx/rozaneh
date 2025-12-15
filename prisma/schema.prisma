@@ -61,6 +61,7 @@ model User {
   appointments  Appointment[] @relation("PatientAppointments")
   assessments   Assessment[]
   medicalHistory MedicalHistory[]
+  comments      Comment[]
   
   // Therapist specific relations
   therapistProfile TherapistProfile?
@@ -95,6 +96,7 @@ model TherapistProfile {
   updatedAt       DateTime @updatedAt
 
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Removed comments relation since therapists are mock data
   
   @@map("therapist_profiles")
 }
@@ -187,6 +189,33 @@ model VideoSession {
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   
   @@map("video_sessions")
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  therapistId String   // No foreign key - just stores the ID as string
+  userName    String   // Name of the user leaving the comment
+  userEmail   String?  // Optional contact email
+  userId      String?  // Optional link if user is logged in
+  message     String
+  rating      Int      @default(5)
+  reply       String?  // Therapist's reply
+  isReplied   Boolean  @default(false)
+  status      CommentStatus @default(PENDING) // Moderation status if needed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Removed foreign key relation since therapists are mock data
+  user        User?            @relation(fields: [userId], references: [id])
+
+  @@index([therapistId])
+  @@map("comments")
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum UserRole {

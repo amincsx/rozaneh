@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test POST Requests</title>
+</head>
+
+<body>
+    <h1>API Test</h1>
+    <button onclick="testGet()">Test GET /api/test</button>
+    <button onclick="testPost()">Test POST /api/test</button>
+    <button onclick="testRegister()">Test POST /api/auth/register-universal</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testGet() {
+            try {
+                const res = await fetch('/api/test');
+                const data = await res.json();
+                document.getElementById('result').textContent = 'GET /api/test:\n' + JSON.stringify(data, null, 2);
+            } catch (e) {
+                document.getElementById('result').textContent = 'Error: ' + e.message;
+            }
+        }
+
+        async function testPost() {
+            try {
+                const res = await fetch('/api/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ test: 'data' })
+                });
+                const data = await res.json();
+                document.getElementById('result').textContent = 'POST /api/test:\n' + JSON.stringify(data, null, 2);
+            } catch (e) {
+                document.getElementById('result').textContent = 'Error: ' + e.message;
+            }
+        }
+
+        async function testRegister() {
+            try {
+                const res = await fetch('/api/auth/register-universal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: 'test' + Date.now() + '@example.com',
+                        password: 'password123456',
+                        userType: 'user'
+                    })
+                });
+                const data = await res.json();
+                document.getElementById('result').textContent = 'POST /api/auth/register-universal:\n' + JSON.stringify(data, null, 2);
+            } catch (e) {
+                document.getElementById('result').textContent = 'Error: ' + e.message;
+            }
+        }
+    </script>
+</body>
+
+</html>

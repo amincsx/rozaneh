@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: rozaneh-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: iapqIvsm1GACa6OPHFnqQhWl
+      MONGO_INITDB_DATABASE: my-app
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - rozaneh-network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: rozaneh-mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: iapqIvsm1GACa6OPHFnqQhWl
+      ME_CONFIG_MONGODB_URL: mongodb://root:iapqIvsm1GACa6OPHFnqQhWl@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb
+    networks:
+      - rozaneh-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  rozaneh-network:
+    driver: bridge

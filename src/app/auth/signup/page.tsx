@@ -13,8 +13,7 @@ export default function SignUpPage() {
         email: "",
         phone: "",
         password: "",
-        confirmPassword: "",
-        role: "PATIENT" as "PATIENT" | "THERAPIST"
+        confirmPassword: ""
     })
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -40,7 +39,8 @@ export default function SignUpPage() {
         }
 
         try {
-            const response = await fetch("/api/auth/register", {
+            // Use the universal signup endpoint
+            const response = await fetch("/api/auth/register-universal", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -50,17 +50,38 @@ export default function SignUpPage() {
                     email: formData.email,
                     phone: formData.phone,
                     password: formData.password,
-                    role: formData.role,
+                    userType: 'user',
                 }),
-            })
+            });
 
             if (response.ok) {
-                router.push("/auth/signin?message=ثبت نام با موفقیت انجام شد")
+                const data = await response.json()
+                if (data.success && data.user) {
+                    // Store user info in localStorage for dashboard
+                    localStorage.setItem('user_id', data.user.user_id)
+                    localStorage.setItem('email', data.user.email)
+                    localStorage.setItem('name', data.user.name)
+                    localStorage.setItem('userType', data.user.userType)
+
+                    console.log('[Signup] Signup successful, stored user data:', data.user)
+
+                    // Redirect based on user type
+                    if (data.user.userType === 'therapist') {
+                        router.push("/therapist-dashboard")
+                    } else if (data.user.userType === 'employee') {
+                        router.push("/employee-dashboard")
+                    } else {
+                        router.push("/dashboard")
+                    }
+                } else {
+                    setError(data.message || "خطا در ثبت نام")
+                }
             } else {
                 const data = await response.json()
                 setError(data.message || "خطا در ثبت نام")
             }
         } catch (error) {
+            console.error('[Signup] Error:', error)
             setError("خطا در ثبت نام. لطفا دوباره تلاش کنید")
         } finally {
             setIsLoading(false)
@@ -77,6 +98,19 @@ export default function SignUpPage() {
     return (
         <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
+                {/* Back Button */}
+                <div className="flex justify-start mb-4">
+                    <button
+                        onClick={() => router.push("/")}
+                        className="flex items-center gap-2 text-teal-600 hover:text-teal-700 font-arabic text-sm transition-colors"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        بازگشت
+                    </button>
+                </div>
+
                 <div className="text-center">
                     <h2 className="mt-6 text-3xl font-bold text-gray-900 font-arabic">
                         ایجاد حساب کاربری جدید
@@ -99,22 +133,6 @@ export default function SignUpPage() {
                                 {error}
                             </div>
                         )}
-
-                        <div>
-                            <label htmlFor="role" className="block text-sm font-medium text-gray-700 font-arabic">
-                                نوع حساب کاربری
-                            </label>
-                            <select
-                                id="role"
-                                name="role"
-                                value={formData.role}
-                                onChange={handleInputChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 font-arabic"
-                            >
-                                <option value="PATIENT">بیمار</option>
-                                <option value="THERAPIST">مشاور/درمانگر</option>
-                            </select>
-                        </div>
 
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 font-arabic">

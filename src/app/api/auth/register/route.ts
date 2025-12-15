@@ -24,7 +24,17 @@ export async function POST(request: NextRequest) {
         // Check if user already exists
         const existingUser = await prisma.user.findUnique({
             where: { email }
+        }).catch((error: any) => {
+            console.error('[Register] Database connection error:', error.message)
+            return null
         })
+
+        if (existingUser === undefined) {
+            return NextResponse.json(
+                { message: "خطا در اتصال به پایگاه داده - لطفا دوباره تلاش کنید" },
+                { status: 500 }
+            )
+        }
 
         if (existingUser) {
             return NextResponse.json(
@@ -45,6 +55,9 @@ export async function POST(request: NextRequest) {
                 password: hashedPassword,
                 role: role || "PATIENT",
             }
+        }).catch((error: any) => {
+            console.error('[Register] Error creating user:', error.message)
+            throw error
         })
 
         // Remove password from response
@@ -57,8 +70,17 @@ export async function POST(request: NextRequest) {
             },
             { status: 201 }
         )
-    } catch (error) {
-        console.error("Registration error:", error)
+    } catch (error: any) {
+        console.error("Registration error:", error.message || error)
+
+        // Check if it's a database connection error
+        if (error.message?.includes('getaddrinfo') || error.message?.includes('ECONNREFUSED') || error.message?.includes('timeout')) {
+            return NextResponse.json(
+                { message: "خطا در اتصال به پایگاه داده - لطفا دوباره تلاش کنید" },
+                { status: 503 }
+            )
+        }
+
         return NextResponse.json(
             { message: "خطا در ایجاد حساب کاربری" },
             { status: 500 }

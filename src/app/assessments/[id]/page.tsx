@@ -4,21 +4,19 @@ export default async function TestDetailPage({ params }: { params: Promise<{ id:
     const { id } = await params;
     const assessmentId = id;
 
-    // Sample questions for different tests
-    const testQuestions: Record<string, Array<{ question: string; options: string[] }>> = {
-        "0": [
-            { question: "سؤال ۱: کدام شکل بعدی در الگو است؟", options: ["الف", "ب", "ج", "د"] },
-            { question: "سؤال ۲: مجموع این اعداد چقدر است؟", options: ["۱۰", "۱۵", "۲۰", "۲۵"] },
-            { question: "سؤال ۳: این کلمه چه معنایی دارد؟", options: ["معنی ۱", "معنی ۲", "معنی ۳", "معنی ۴"] }
-        ],
-        "2": [
-            { question: "آیا شما انجام‌دهنده یا تفکیرکننده هستید؟", options: ["انجام‌دهنده", "تفکیرکننده"] },
-            { question: "آیا شما درون‌گرا یا برون‌گرا هستید؟", options: ["درون‌گرا", "برون‌گرا"] },
-            { question: "آیا شما به جزئیات یا کلیات توجه می‌کنید؟", options: ["جزئیات", "کلیات"] }
-        ]
-    };
+    const assessments = [
+        { title: "آزمون وکسلر هوش کودکان (WISC-V)" },
+        { title: "آزمون میلون (MCMI-IV)" },
+        { title: "آزمون MBTI" },
+        { title: "آزمون رورشاخ (Rorschach)" },
+        { title: "آزمون MMPI-2" },
+        { title: "آزمون TAT" },
+        { title: "آزمون NEO-PI-R" },
+        { title: "آزمون SCL-90-R" },
+        { title: "آزمون بک (BDI-II / BAI)" }
+    ];
 
-    const questions = testQuestions[assessmentId] || [];
+    const currentAssessment = assessments[parseInt(assessmentId)] || assessments[0];
 
     return (
         <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50">
@@ -39,44 +37,33 @@ export default async function TestDetailPage({ params }: { params: Promise<{ id:
                     </div>
                 </div>
 
-                {/* Main Content */}
-                <div className="w-full max-w-4xl mx-auto px-6 py-12">
-                    {/* Instructions */}
-                    <section dir="rtl" className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-8 mb-8 shadow-sm">
-                        <h2 className="text-2xl font-bold text-teal-700 mb-4">شروع آزمون</h2>
-                        <p className="text-gray-600 leading-relaxed mb-4">
-                            لطفاً به هر سؤال با دقت پاسخ دهید. این آزمون برای ارزیابی شخصیتی شما طراحی شده است.
+                {/* Main Content - Coming Soon */}
+                <div className="w-full max-w-4xl mx-auto px-6 py-16 flex items-center justify-center min-h-[70vh]">
+                    <section dir="rtl" className="text-center bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-12 shadow-sm max-w-md">
+                        <div className="mb-8">
+                            <svg className="w-24 h-24 mx-auto text-teal-600 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-teal-700 mb-4">به زودی در دسترس</h2>
+                        <h3 className="text-lg font-semibold text-teal-600 mb-6">{currentAssessment.title}</h3>
+                        <p className="text-gray-600 mb-8 leading-relaxed">
+                            این آزمون در حال تدارک است. لطفا برای آزمون‌های فعال بخش آزمون‌های روانشناختی را ملاحظه کنید یا با مشاوران ما تماس بگیرید.
                         </p>
-                        <p className="text-gray-600 leading-relaxed">
-                            زمان: بدون محدودیت | تعداد سؤالات: {questions.length}
-                        </p>
-                    </section>
-
-                    {/* Questions */}
-                    <section dir="rtl" className="space-y-6">
-                        {questions.map((q, index) => (
-                            <div key={index} className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-6 shadow-sm">
-                                <h3 className="text-lg font-bold text-teal-700 mb-4">{q.question}</h3>
-                                <div className="space-y-3">
-                                    {q.options.map((option: string, optIndex: number) => (
-                                        <label key={optIndex} className="flex items-center p-3 bg-white/10 rounded-lg cursor-pointer hover:bg-white/20 transition-all">
-                                            <input type="radio" name={`q${index}`} value={option} className="ml-3" />
-                                            <span className="text-gray-700">{option}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </section>
-
-                    {/* Actions */}
-                    <section dir="rtl" className="mt-8 flex flex-col gap-3">
-                        <button className="bg-teal-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm">
-                            ارسال آزمون
-                        </button>
-                        <p className="text-center text-gray-600 text-sm">
-                            برای شرکت در آزمون، لطفاً <Link href="/login" className="text-teal-600 font-medium hover:underline">وارد شوید</Link>
-                        </p>
+                        <div className="flex flex-col gap-3">
+                            <Link
+                                href="/book-appointment"
+                                className="bg-teal-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-md"
+                            >
+                                رزرو نوبت ارزیابی
+                            </Link>
+                            <Link
+                                href="/assessments"
+                                className="bg-white/30 backdrop-blur-sm border border-white/40 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-white/40 transition-colors"
+                            >
+                                بازگشت به لیست آزمون‌ها
+                            </Link>
+                        </div>
                     </section>
                 </div>
 
