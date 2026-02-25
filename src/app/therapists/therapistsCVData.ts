@@ -372,7 +372,8 @@ export const therapistsCVData: TherapistCV[] = [
         approaches: ["روانکاوی", "ACT", "TA", "داینامیک"],
         education: "کارشناسی ارشد مشاوره خانواده از دانشگاه رودهن",
         experience: "از سال 1398",
-        fees: ""
+        fees: "",
+        workField: ""
     },
     {
         id: "9",
@@ -389,7 +390,8 @@ export const therapistsCVData: TherapistCV[] = [
         approaches: [],
         education: "روانشناسی بالینی ۱۳۹۶",
         experience: "تجربه فعالیت در زمینه نوروتراپی (Tms، Neurofeedback) در کلینیک اتیه درخشان ذهن ۱۴۰۲-۱۴۰۳\nشروع فعالیت در زمینه روان درمانی و نوروتراپی از سال ۹۷ درمراکز درمانی شهر یزد، کرمان، تهران",
-        fees: ""
+        fees: "",
+        workField: ""
     },
     {
         id: "11",
@@ -442,6 +444,7 @@ export const therapistsCVData: TherapistCV[] = [
         approaches: ["CBT", "ACT", "روان‌تحلیلی", "هیجان‌مدار"],
         education: "کارشناسی ارشد: مشاوره خانواده، دانشگاه جنوب تهران\nدکتری: مشاوره، دانشگاه شمال تهران",
         experience: "",
-        fees: ""
+        fees: "",
+        workField: ""
     }
 ]
