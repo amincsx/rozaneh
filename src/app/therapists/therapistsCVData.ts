@@ -447,4 +447,4 @@ export const therapistsCVData: TherapistCV[] = [
         fees: "",
         workField: ""
     }
-]
+];
