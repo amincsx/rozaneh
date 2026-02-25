@@ -8,15 +8,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowRight, Star, MessageSquare, Calendar, Clock, User } from "lucide-react"
+import { therapistsCVData } from "../therapistsCVData"
 
 interface Therapist {
     id: string
     name: string
-    specializations: string[]
     rating: number
     experience: number
     hourlyRate: number
-    bio: string
     image?: string
     languages: string[]
     availableSlots: number
@@ -39,151 +38,121 @@ const mockTherapists: Therapist[] = [
     {
         "id": "4",
         "name": "دکتر محسن محمدی",
-        "specializations": ["عضو هیئت علمی دانشگاه", "مدیر مرکز مشاوره روزنه"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "دکترای تخصصی مشاوره -  مشاور و رواندرمانگر عضو هیئت علمی دانشگاه مدیر مرکز مشاوره روزنه",
         "image": "/psychologists/4/image (12).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "1",
         "name": "دکتر ابوالفضل امینیان",
-        "specializations": ["مشاوره پيش از ازدواج", "مشاوره در زمینه تعارض زناشويی", "سکس تراپی"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "دکتری تخصصی مشاوره - مشاوره فردی (وسواس، افسردگی، شكست عاطفی و ...) مشاوره پيش از ازدواج مشاوره در زمینه تعارض زناشويی سکس تراپی",
         "image": "/psychologists/1/image (15).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "2",
         "name": "زینب ایرانی",
-        "specializations": ["مشاوره پیش از ازدواج", "خانواده درمانی", "زندگی مشترک و تعارضات زوجین"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص روانشناسی بالینی - مشاوره فردی (شخصی، افسردگی، وسواس و...) مشاوره پیش از ازدواج خانواده درمانی زندگی مشترک و تعارضات زوجین",
         "image": "/psychologists/2/image (1).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "3",
         "name": "زهره کیانی",
-        "specializations": ["مشاوره پیش از ازدواج", "خانواده درمانی", "سکس تراپی", "زندگی مشترک و تعارضات زوجین", "گروه درمانی و مشاوره گروهی"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص مشاوره خانواده - مشاوره فردی (شخصی، افسردگی، وسواس و...) مشاوره پیش از ازدواج خانواده درمانی سکس تراپی زندگی مشترک و تعارضات زوجین گروه درمانی و مشاوره گروهی",
         "image": "/psychologists/3/image (13).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "5",
         "name": "الهام عسگری",
-        "specializations": ["مشاوره پیش از ازدواج، زوج و خانواده درمانی", "مشاوره در زمینه تعارض زناشويی", "کارشناس روانشناسی بالینی"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص  روانشناسی شخصیت- مشاوره فردی (وسواس، افسردگی، شكست عاطفی و ...) مشاوره پیش از ازدواج، زوج و خانواده درمانی مشاوره در زمینه تعارض زناشويی کارشناس روانشناسی بالینی",
         "image": "/psychologists/5/image (2).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "6",
         "name": "مینا خضری",
-        "specializations": ["مشاوره پیش از ازدواج، زوج و خانواده درمانی", "مشاوره در زمینه تعارض زناشويی"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص مشاوره خانواده - مشاوره فردی (وسواس، افسردگی، شكست عاطفی و ...) مشاوره پیش از ازدواج، زوج و خانواده درمانی مشاوره در زمینه تعارض زناشويی",
         "image": "/psychologists/6/image (3).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "7",
-        "name": "زهرا بیگی",
-        "specializations": ["مشاوره پیش از ازدواج، زوج و خانواده درمانی", "مشاوره نوجوان", "تعارض ها و مشکلات بین فردی"],
+        "name": "زهرا بیکی",
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص مشاوره - مشاور و درمانگر فردی (وسواس، افسردگی، شكست عاطفی و ...) مشاوره پیش از ازدواج، زوج و خانواده درمانی مشاوره نوجوان تعارض ها و مشکلات بین فردی",
         "image": "/psychologists/7/image (4).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "8",
         "name": "رضا معیری",
-        "specializations": ["مشاوره فردی وسواس، افسردگی، شكست عاطفی و ...", "مشاوره پیش از ازدواج، زوج و خانواده درمانی", "مشاوره در زمینه تعارض ها و مشکلات بین فردی"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "دکترای تخصصی روانشناسی - درمانگر بالینی مشاوره فردی (وسواس، افسردگی، شكست عاطفی و ...) مشاوره پیش از ازدواج، زوج و خانواده درمانی مشاوره در زمینه تعارض ها و مشکلات بین فردی",
         "image": "/psychologists/8/image (5).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "9",
         "name": "مهسا باغبانی",
-        "specializations": ["مشاوره فردی", "وسواس، افسردگی، شكست عاطفی، اختلالات خلقی", "مشاوره در زمینه تعارض ها و مشکلات بین فردی"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص روانشناسی بالینی - مشاوره فردی وسواس، افسردگی، شكست عاطفی، اختلالات خلقی مشاوره در زمینه تعارض ها و مشکلات بین فردی",
         "image": "/psychologists/9/image (6).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "10",
         "name": "مژگان میرزاده",
-        "specializations": ["درمان اختلالات یادگیری و كمبود توجه و تمركز", "اجرا و تحليل آزمون هاي هوش", "تشخيص و آموزش در حيطه اتيسم"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص روانشناسی بالینی- درمانگر کودک و نوجوان درمان اختلالات یادگیری و كمبود توجه و تمركز اجرا و تحليل آزمون هاي هوش تشخيص و آموزش در حيطه اتيسم",
         "image": "/psychologists/10/image (7).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "11",
         "name": "دکتر یاسمن صالح",
-        "specializations": ["مشاوره فردی"], "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "دکتر یاسمن صالح - متخصص مشاوره فردی", "image": "/psychologists/11/image (8).webp", "languages": ["فارسی"], "availableSlots": 10
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/11/image (8).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "12",
         "name": "سارا گلچوبیان",
-        "specializations": ["مشاوره فردی"], "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "سارا گلچوبیان - متخصص مشاوره فردی", "image": "/psychologists/12/image (9).webp", "languages": ["فارسی"], "availableSlots": 10
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/12/image (9).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "13",
         "name": "زهرا صادقی",
-        "specializations": ["مشاوره فردی وسواس، افسردگی، اضطراب و..", "تعارضات بین فردی", "مانگر حوزه نوجوان", "خانواده درمانی", "مشاوره زوج"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص مشاوره - مشاوره فردی (وسواس، افسردگی، اضطراب و..) تعارضات بین فردی مانگر حوزه نوجوان خانواده درمانی مشاوره زوج",
         "image": "/psychologists/13/image (10).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "14",
         "name": "دکتر بهار ایروانی",
-        "specializations": ["مشاوره پیش از ازدواج", "مشاوره فردی", "مشاوره خانواده"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "دکترای تخصصی مشاوره - زوج درمانی( مشاوره در زمینه تعارض های زوجی و پیمان شکنی عاطفی) مشاوره پیش از ازدواج مشاوره فردی مشاوره خانواده",
         "image": "/psychologists/14/image (11).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "15",
         "name": "دکتر نسرین واسعی",
-        "specializations": ["مشاوره پیش از ازدواج، زوج و خانواده درمانی", "حل تعارضات زناشويی"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "دکترای تخصصی مشاوره - مشاوره فردی (وسواس، افسردگی، شكست عاطفی و ...) مشاوره پیش از ازدواج، زوج و خانواده درمانی حل تعارضات زناشويی",
         "image": "/psychologists/15/image (12).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "16",
         "name": "زهرا سادات اطیابی",
-        "specializations": ["مشاوره فردی پنیک، افسردگی، اضطراب، وسواس و ...", "مشاوره زوج و خانواده درمانیتعارضات زناشویی و..", "درمانگر نوجوان", "مشاوره پیش از ازدواج"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص روانشناسی بالینی - مشاوره فردی (پنیک، افسردگی، اضطراب، وسواس و ...) مشاوره زوج و خانواده درمانی(تعارضات زناشویی و..) درمانگر نوجوان مشاوره پیش از ازدواج",
         "image": "/psychologists/16/image (13).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "17",
         "name": "لیلا بیرانوند",
-        "specializations": ["فرزند پروری"], "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص روانشناسی بالینی - متخصص در حوزه کودک و نوجوان فرزند پروری", "image": "/psychologists/17/image (14).webp", "languages": ["فارسی"], "availableSlots": 10
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/17/image (14).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "18",
         "name": "نگار غایبی",
-        "specializations": ["مشاوره"], "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "دکترای تخصصی مشاوره - مشاوره فردی (وسواس، افسردگی، سوگ، شکست عاطقی و...)  مشاوره زوح و خانواده درمانی",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/18/image (15).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "19",
         "name": "محمد جدیدکار همدانی",
-        "specializations": ["مشاوره فردی"], "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "محمد جدیدکار همدانی - متخصص مشاوره فردی", "image": "/psychologists/19/image (16).webp", "languages": ["فارسی"], "availableSlots": 10
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/19/image (16).webp", "languages": ["فارسی"], "availableSlots": 10
     },
     {
         "id": "20",
         "name": "بهاره نعمتی روشن",
-        "specializations": ["- مشاوره پیش از ازدواج - زوج و خانواده درمانی"], "rating": 4.5, "experience": 10, "hourlyRate": 300000,
-        "bio": "متخصص روانشناسی بالینی - - مشاوره فردی  در خصوص اختلالات شخصیت( وسواس ، اضطراب، افسردگی و .. ) - مشاوره پیش از ازدواج - زوج و خانواده درمانی",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/20/image (17).webp", "languages": ["فارسی"], "availableSlots": 10
     }
 ]
@@ -197,11 +166,15 @@ export default function TherapistProfilePage() {
     const [comments, setComments] = useState<Comment[]>([])
     const [newComment, setNewComment] = useState({ author: "", text: "", rating: 5 })
     const [showCommentForm, setShowCommentForm] = useState(false)
+    const [therapistCV, setTherapistCV] = useState<typeof therapistsCVData[0] | null>(null)
 
     useEffect(() => {
         const found = mockTherapists.find(t => t.id === therapistId)
         if (found) {
             setTherapist(found)
+            // Find CV data
+            const cvData = therapistsCVData.find(cv => cv.id === therapistId)
+            setTherapistCV(cvData || null)
             // Load comments from database
             fetchComments()
         }
@@ -300,12 +273,6 @@ export default function TherapistProfilePage() {
             "name": "کلینیک روانشناسی روزنه",
             "url": "https://rozaneh.com"
         },
-        "knowsAbout": therapist.specializations,
-        "description": therapist.bio,
-        "hasCredential": therapist.specializations.map(spec => ({
-            "@type": "EducationalOccupationalCredential",
-            "credentialCategory": spec
-        })),
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": therapist.rating,
@@ -364,33 +331,14 @@ export default function TherapistProfilePage() {
 
                             {/* Info */}
                             <div className="p-6 sm:p-8 flex-grow flex flex-col justify-between">
-                                <div>
-                                    <h1 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-3 font-farsi">
+                                <div className="mt-16">
+                                    <h1 className="text-3xl sm:text-4xl text-slate-800 mb-3 font-farsi font-bold text-center">
                                         {therapist.name}
                                     </h1>
-
-                                    <p className="text-slate-700 mb-6 leading-relaxed font-farsi text-base">
-                                        {therapist.bio}
-                                    </p>
-
-                                    {/* Specializations */}
-                                    <div className="mb-6">
-                                        <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">تخصص‌ها:</h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {therapist.specializations.map((spec, index) => (
-                                                <span
-                                                    key={index}
-                                                    className="px-3 py-1 bg-teal-100/50 text-slate-700 text-xs rounded-full font-farsi font-medium border border-teal-200"
-                                                >
-                                                    {spec}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex flex-col sm:flex-row gap-3">
+                                <div className="flex flex-col sm:flex-row gap-3 mb-8">
                                     <Link href={`/book-appointment?therapist=${therapist.id}`} className="flex-1">
                                         <Button className="w-full font-farsi bg-teal-600 hover:bg-teal-700 text-white h-11 text-sm font-medium shadow-md cursor-pointer">
                                             <Calendar className="w-4 h-4 ml-2" />
@@ -400,6 +348,144 @@ export default function TherapistProfilePage() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* CV Section */}
+                    <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
+                        <h2 className="text-2xl font-bold text-slate-800 font-farsi mb-6 flex items-center gap-2">
+                            <User className="w-6 h-6" />
+                            رزومه و اطلاعات حرفه‌ای
+                        </h2>
+
+                        {therapistCV ? (
+                            <div className="space-y-6">
+                                {/* Row 1 */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* City */}
+                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">شهر</h3>
+                                        <p className="text-slate-700 font-farsi">{therapistCV.city}</p>
+                                    </div>
+
+                                    {/* Service Types */}
+                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">نوع خدمات</h3>
+                                        <p className="text-slate-700 font-farsi whitespace-pre-wrap">{therapistCV.serviceTypes}</p>
+                                    </div>
+                                </div>
+
+                                {/* Row 2 */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Working Days */}
+                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">روزهای کاری</h3>
+                                        <p className="text-slate-700 font-farsi whitespace-pre-wrap text-sm">{therapistCV.workingDays}</p>
+                                    </div>
+
+                                    {/* Psychology License Number */}
+                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">شماره نظام روانشناسی</h3>
+                                        <p className="text-slate-700 font-farsi">{therapistCV.psychologyLicenseNumber}</p>
+                                    </div>
+                                </div>
+
+                                {/* Row 3 */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Contact Info */}
+                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">تماس و رزرو</h3>
+                                        <p className="text-slate-700 font-farsi">{therapistCV.contactInfo}</p>
+                                    </div>
+
+                                    {/* Age Group */}
+                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">گروه سنی</h3>
+                                        <p className="text-slate-700 font-farsi">{therapistCV.ageGroup}</p>
+                                    </div>
+                                </div>
+
+                                {/* Personal Introduction */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">معرفی شخصی</h3>
+                                    <p className="text-slate-700 font-farsi leading-relaxed">{therapistCV.personalViewOnTherapy}</p>
+                                </div>
+
+                                {/* Therapeutic Approaches */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">رویکردهای درمانی</h3>
+                                    <p className="text-slate-700 font-farsi mb-3">{therapistCV.therapeuticApproach}</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {therapistCV.approaches.map((approach, index) => (
+                                            <span key={index} className="px-3 py-1 bg-teal-100/50 text-slate-700 text-xs rounded-full font-farsi font-medium border border-teal-200">
+                                                {approach}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Work Field */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">حوزه‌های تخصصی</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {therapistCV.specializations.map((spec, index) => (
+                                            <span key={index} className="px-3 py-1 bg-blue-100/50 text-slate-700 text-xs rounded-full font-farsi font-medium border border-blue-200">
+                                                {spec}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Change Philosophy */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">نگاه به درمان و تغییر</h3>
+                                    <p className="text-slate-700 font-farsi leading-relaxed">{therapistCV.changePhilosophy}</p>
+                                </div>
+
+                                {/* In Sessions */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">در جلسات درمانی</h3>
+                                    <p className="text-slate-700 font-farsi leading-relaxed">{therapistCV.inSessions}</p>
+                                </div>
+
+                                {/* Education */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">تحصیلات</h3>
+                                    <p className="text-slate-700 font-farsi leading-relaxed whitespace-pre-wrap">{therapistCV.education}</p>
+                                </div>
+
+                                {/* Experience */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">تجارب و سابقه کار</h3>
+                                    <p className="text-slate-700 font-farsi leading-relaxed whitespace-pre-wrap">{therapistCV.experience}</p>
+                                </div>
+
+                                {/* Fees */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">تعرفه خدمات</h3>
+                                    <p className="text-slate-700 font-farsi leading-relaxed whitespace-pre-wrap">{therapistCV.fees}</p>
+                                </div>
+
+                                {/* View on Therapy Room */}
+                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">نگاه به اتاق درمان</h3>
+                                    <p className="text-slate-700 font-farsi leading-relaxed">{therapistCV.viewOnTherapyRoom}</p>
+                                </div>
+
+                                {/* Closing Statement */}
+                                <div className="bg-gradient-to-r from-teal-50 to-blue-50 backdrop-blur-lg border border-teal-200 rounded-xl p-5">
+                                    <p className="text-slate-700 font-farsi leading-relaxed italic">{therapistCV.closingStatement}</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Placeholders if no CV data */}
+                                {[...Array(10)].map((_, index) => (
+                                    <div key={index} className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
+                                        <p className="text-slate-700 font-farsi">-</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Comments Section */}

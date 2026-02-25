@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
+import { Poppins, Vazirmatn } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+
+const vazirmatn = Vazirmatn({
+  variable: "--font-vazirmatn",
+  subsets: ["arabic", "latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://rozanehclinic.com'),
@@ -94,7 +109,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" className={`${vazirmatn.variable} ${poppins.variable}`}>
       <head>
         <GoogleAnalytics gaId="GA_MEASUREMENT_ID" />
         <meta charSet="utf-8" />

@@ -97,7 +97,7 @@ function BookAppointmentContent() {
         reason: "",
         emergencyContact: "",
         notes: "",
-        paymentMethod: ""
+        paymentMethod: "کارت به کارت"
     })
 
     useEffect(() => {
@@ -425,21 +425,12 @@ function BookAppointmentContent() {
                                 روش پرداخت
                             </h3>
                             <div className="space-y-3">
-                                {["زرین‌پال", "پارسیان", "درگاه بانک ملی"].map((method) => (
-                                    <div
-                                        key={method}
-                                        className={`border-2 rounded-lg p-3 cursor-pointer transition-colors ${formData.paymentMethod === method
-                                            ? "border-teal-500 bg-teal-50"
-                                            : "border-gray-200 hover:border-gray-300"
-                                            }`}
-                                        onClick={() => setFormData({ ...formData, paymentMethod: method })}
-                                    >
-                                        <div className="flex items-center">
-                                            <CreditCard className="w-5 h-5 text-teal-600 ml-3" />
-                                            <span className="font-arabic">{method}</span>
-                                        </div>
+                                <div className="border-2 rounded-lg p-3 bg-teal-50">
+                                    <div className="flex items-center">
+                                        <CreditCard className="w-5 h-5 text-teal-600 ml-3" />
+                                        <span className="font-arabic">کارت به کارت</span>
                                     </div>
-                                ))}
+                                </div>
                             </div>
                         </div>
                     </div>
