@@ -155,7 +155,7 @@ const mockTherapists: Therapist[] = [
     },
     {
         "id": "18",
-        "name": "نگار غایبی",
+        "name": " دکتر نگار غایبی ",
         "specializations": ["مشاوره"], "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "bio": "دکترای تخصصی مشاوره - مشاوره فردی (وسواس، افسردگی، سوگ، شکست عاطقی و...)  مشاوره زوح و خانواده درمانی",
         "image": "/psychologists/18/image (15).webp", "languages": ["فارسی"], "availableSlots": 10

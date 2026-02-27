@@ -139,7 +139,7 @@ const mockTherapists: Therapist[] = [
     },
     {
         "id": "18",
-        "name": "نگار غایبی",
+        "name": " دکتر نگار غایبی ",
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/18/image (15).webp", "languages": ["فارسی"], "availableSlots": 10
     },
