@@ -26,7 +26,7 @@ export default function SEO({
     structuredData
 }: SEOProps) {
     const siteName = 'کلینیک روانشناسی روزنه'
-    const siteUrl = 'https://rozaneh.com'
+    const siteUrl = 'https://rozanehclinic.com'
 
     return (
         <Head>
