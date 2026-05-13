@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
+import HomeNavbar from "@/components/HomeNavbar";
 
 export const metadata: Metadata = {
   title: "کلینیک روانشناسی روزنه - مشاوره آنلاین با بهترین متخصصان ایران",
@@ -117,50 +118,7 @@ export default function Home() {
         </div>
 
         {/* Navigation Menu */}
-        {/* Navigation */}
-
-        <nav className="absolute top-25 md:top-16 right-2 md:right-12 lg:right-20 3xl:right-56 z-10 max-w-[calc(100vw-1rem)]">
-          <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-1.5 md:px-6 py-2 md:py-3 shadow-sm overflow-x-auto">
-            <ul dir="rtl" className="flex space-x-reverse space-x-2 md:space-x-5 lg:space-x-6 3xl:space-x-9 font-arabic whitespace-nowrap">
-
-              <li>
-                <Link href="/login" className="text-gray-700 hover:text-teal-600 font-regular transition-all duration-300 px-2 py-1 md:px-3 md:py-2 3xl:px-8 3xl:py-4 rounded-md text-sm md:text-base 4xl:text-xl inline-block transform hover:scale-105">
-                  ورود
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact-us" className="text-gray-700 hover:text-teal-600 font-regular transition-all duration-300 px-2 py-1 md:px-3 md:py-2 3xl:px-8 3xl:py-4 rounded-md text-sm md:text-base 4xl:text-xl inline-block transform hover:scale-105">
-                  تماس
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-gray-700 hover:text-teal-600 font-regular transition-all duration-300 px-2 py-1 md:px-3 md:py-2 3xl:px-8 3xl:py-4 rounded-md text-sm md:text-base 4xl:text-xl inline-block transform hover:scale-105">
-                  درباره
-                </Link>
-              </li>
-              <li>
-                <a href="/services" className="text-gray-700 hover:text-teal-600 font-regular transition-all duration-300 px-2 py-1 md:px-3 md:py-2 3xl:px-8 3xl:py-4 rounded-md text-sm md:text-base 4xl:text-xl inline-block transform hover:scale-105">
-                  خدمات
-                </a>
-              </li>
-              <li>
-                <Link href="/assessments" className="text-gray-700 hover:text-teal-600 font-regular transition-all duration-300 px-2 py-1 md:px-3 md:py-2 3xl:px-8 3xl:py-4 rounded-md text-sm md:text-base 4xl:text-xl inline-block transform hover:scale-105">
-                  تست‌ها
-                </Link>
-              </li>
-              <li>
-                <Link href="/therapists" className="text-gray-700  hover:text-teal-600 font-regular transition-all duration-300 px-2 py-1 md:px-3 md:py-2 3xl:px-8 3xl:py-4 rounded-md  text-sm md:text-base 4xl:text-xl inline-block transform hover:scale-105">
-                  مشاوران
-                </Link>
-              </li>
-              <li>
-                <Link href="/essays" className="text-gray-700 hover:text-teal-600 font-regular transition-all duration-300 px-2 py-1 md:px-3 md:py-2 3xl:px-8 3xl:py-4 rounded-md text-sm md:text-base 4xl:text-xl inline-block transform hover:scale-105">
-                  مقالات
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </nav>
+        <HomeNavbar />
 
         {/* Main Content */}
         <div dir="rtl" className="absolute top-3/8 md:top-120 right-4 md:right-12 lg:right-20 3xl:right-56 transform -translate-y-1/2 text-right max-w-[calc(100vw-2rem)] md:max-w-lg 2xl:max-w-4xl 3xl:max-w-7xl font-arabic px-2">

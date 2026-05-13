@@ -168,6 +168,8 @@ export default function TherapistProfilePage() {
     const [showCommentForm, setShowCommentForm] = useState(false)
     const [therapistCV, setTherapistCV] = useState<typeof therapistsCVData[0] | null>(null)
 
+    const cvText = therapistCV?.rawCv?.trim() || ''
+
     useEffect(() => {
         const found = mockTherapists.find(t => t.id === therapistId)
         if (found) {
@@ -357,135 +359,11 @@ export default function TherapistProfilePage() {
                             رزومه و اطلاعات حرفه‌ای
                         </h2>
 
-                        {therapistCV ? (
-                            <div className="space-y-6">
-                                {/* Row 1 */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* City */}
-                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">شهر</h3>
-                                        <p className="text-slate-700 font-farsi">{therapistCV.city}</p>
-                                    </div>
-
-                                    {/* Service Types */}
-                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">نوع خدمات</h3>
-                                        <p className="text-slate-700 font-farsi whitespace-pre-wrap">{therapistCV.serviceTypes}</p>
-                                    </div>
-                                </div>
-
-                                {/* Row 2 */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Working Days */}
-                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">روزهای کاری</h3>
-                                        <p className="text-slate-700 font-farsi whitespace-pre-wrap text-sm">{therapistCV.workingDays}</p>
-                                    </div>
-
-                                    {/* Psychology License Number */}
-                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">شماره نظام روانشناسی</h3>
-                                        <p className="text-slate-700 font-farsi">{therapistCV.psychologyLicenseNumber}</p>
-                                    </div>
-                                </div>
-
-                                {/* Row 3 */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Contact Info */}
-                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">تماس و رزرو</h3>
-                                        <p className="text-slate-700 font-farsi">{therapistCV.contactInfo}</p>
-                                    </div>
-
-                                    {/* Age Group */}
-                                    <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                        <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">گروه سنی</h3>
-                                        <p className="text-slate-700 font-farsi">{therapistCV.ageGroup}</p>
-                                    </div>
-                                </div>
-
-                                {/* Personal Introduction */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">معرفی شخصی</h3>
-                                    <p className="text-slate-700 font-farsi leading-relaxed">{therapistCV.personalViewOnTherapy}</p>
-                                </div>
-
-                                {/* Therapeutic Approaches */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">رویکردهای درمانی</h3>
-                                    <p className="text-slate-700 font-farsi mb-3">{therapistCV.therapeuticApproach}</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {therapistCV.approaches.map((approach, index) => (
-                                            <span key={index} className="px-3 py-1 bg-teal-100/50 text-slate-700 text-xs rounded-full font-farsi font-medium border border-teal-200">
-                                                {approach}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Work Field */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">حوزه‌های تخصصی</h3>
-                                    <div className="flex flex-wrap gap-2">
-                                        {therapistCV.specializations.map((spec, index) => (
-                                            <span key={index} className="px-3 py-1 bg-blue-100/50 text-slate-700 text-xs rounded-full font-farsi font-medium border border-blue-200">
-                                                {spec}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Change Philosophy */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">نگاه به درمان و تغییر</h3>
-                                    <p className="text-slate-700 font-farsi leading-relaxed">{therapistCV.changePhilosophy}</p>
-                                </div>
-
-                                {/* In Sessions */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">در جلسات درمانی</h3>
-                                    <p className="text-slate-700 font-farsi leading-relaxed">{therapistCV.inSessions}</p>
-                                </div>
-
-                                {/* Education */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">تحصیلات</h3>
-                                    <p className="text-slate-700 font-farsi leading-relaxed whitespace-pre-wrap">{therapistCV.education}</p>
-                                </div>
-
-                                {/* Experience */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">تجارب و سابقه کار</h3>
-                                    <p className="text-slate-700 font-farsi leading-relaxed whitespace-pre-wrap">{therapistCV.experience}</p>
-                                </div>
-
-                                {/* Fees */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-3 font-farsi">تعرفه خدمات</h3>
-                                    <p className="text-slate-700 font-farsi leading-relaxed whitespace-pre-wrap">{therapistCV.fees}</p>
-                                </div>
-
-                                {/* View on Therapy Room */}
-                                <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-slate-600 mb-2 font-farsi">نگاه به اتاق درمان</h3>
-                                    <p className="text-slate-700 font-farsi leading-relaxed">{therapistCV.viewOnTherapyRoom}</p>
-                                </div>
-
-                                {/* Closing Statement */}
-                                <div className="bg-gradient-to-r from-teal-50 to-blue-50 backdrop-blur-lg border border-teal-200 rounded-xl p-5">
-                                    <p className="text-slate-700 font-farsi leading-relaxed italic">{therapistCV.closingStatement}</p>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Placeholders if no CV data */}
-                                {[...Array(10)].map((_, index) => (
-                                    <div key={index} className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-5">
-                                        <p className="text-slate-700 font-farsi">-</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-6">
+                            <p className="text-slate-700 font-farsi leading-relaxed whitespace-pre-wrap">
+                                {cvText || "اطلاعاتی برای نمایش وجود ندارد."}
+                            </p>
+                        </div>
                     </div>
 
                     {/* Comments Section */}
