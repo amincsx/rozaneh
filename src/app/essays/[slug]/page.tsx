@@ -141,6 +141,7 @@ export default async function EssayDetailsPage({ params }: PageProps) {
                             fill
                             priority
                             className="object-cover"
+                            style={{ objectPosition: essay.imagePosition?.hero ?? essay.imagePosition?.card ?? "center center" }}
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/75 via-slate-900/25 to-transparent" />

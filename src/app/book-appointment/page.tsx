@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import Navbar from "@/components/Navbar"
 import {
     Calendar,
     Clock,
@@ -153,7 +152,7 @@ function BookAppointmentContent() {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl overflow-x-hidden">
-            <Navbar textColor="gray" />
+
             {/* Header */}
             <div dir="rtl" className="text-center mb-8 mt-16">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2 font-arabic text-center">

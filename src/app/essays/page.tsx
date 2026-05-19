@@ -34,6 +34,7 @@ export default function EssaysPage() {
                                     width={1746}
                                     height={901}
                                     className="block h-auto w-full sm:h-80 sm:object-cover"
+                                    style={{ objectPosition: essay.imagePosition?.card ?? "center center" }}
                                     sizes="(max-width: 640px) 100vw, 50vw"
                                 />
                             </div>

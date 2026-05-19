@@ -154,6 +154,12 @@ const mockTherapists: Therapist[] = [
         "name": "بهاره نعمتی روشن",
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/20/image (17).webp", "languages": ["فارسی"], "availableSlots": 10
+    },
+    {
+        "id": "21",
+        "name": "بهاره نعمتی روشن",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/21/21.webp", "languages": ["فارسی"], "availableSlots": 10
     }
 ]
 

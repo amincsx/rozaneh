@@ -1,7 +1,14 @@
 import { MetadataRoute } from 'next'
+import { essaysData } from './essays/essaysData'
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = 'https://rozanehclinic.com'
+    const essayEntries: MetadataRoute.Sitemap = essaysData.map((essay) => ({
+        url: `${baseUrl}/essays/${essay.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+    }))
 
     return [
         {
@@ -48,6 +55,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
         {
             url: `${baseUrl}/chat-support`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/essays`,
             lastModified: new Date(),
             changeFrequency: 'weekly',
             priority: 0.8,
@@ -102,5 +115,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: 'monthly',
             priority: 0.6,
         },
+        ...essayEntries,
     ]
 }
