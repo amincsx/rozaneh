@@ -22,6 +22,10 @@ export type Essay = {
         card?: string;
         hero?: string;
     };
+    imageScale?: {
+        card?: number;
+        hero?: number;
+    };
     /** زیرعنوان زیر تیتر اصلی */
     lead: string;
     body: EssayBlock[];
@@ -38,7 +42,11 @@ export const essaysData: Essay[] = [
         image: "/essays pics/darmangar.webp",
         imagePosition: {
             card: "center 38%",
-            hero: "center 22%",
+            hero: "center 10%",
+        },
+        imageScale: {
+            card: 1,
+            hero: 1,
         },
         lead: "راهنمایی کاربردی برای پیدا کردن درمانگری که با نیازها، مسئله و سبک ارتباطی شما هماهنگ باشد.",
         body: [
@@ -242,6 +250,10 @@ export const essaysData: Essay[] = [
         imagePosition: {
             card: "center 42%",
             hero: "center 28%",
+        },
+        imageScale: {
+            card: 1.1,
+            hero: 1.08,
         },
         lead: "افسردگی از منظر رویکرد ساختاری در بافت خانواده",
         body: [

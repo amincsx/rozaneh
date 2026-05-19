@@ -141,22 +141,24 @@ export default async function EssayDetailsPage({ params }: PageProps) {
                             fill
                             priority
                             className="object-cover"
-                            style={{ objectPosition: essay.imagePosition?.hero ?? essay.imagePosition?.card ?? "center center" }}
+                            style={{
+                                objectPosition: essay.imagePosition?.hero ?? essay.imagePosition?.card ?? "center center",
+                                transform: `scale(${essay.imageScale?.hero ?? essay.imageScale?.card ?? 1})`,
+                            }}
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/75 via-slate-900/25 to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
-                            <h1 className="mt-1 text-2xl font-bold leading-snug text-white md:text-4xl md:leading-tight">
-                                {essay.title}
-                            </h1>
-                            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-200 md:text-base md:leading-8">
-                                {essay.lead}
-                            </p>
-                        </div>
                     </div>
 
                     <div className="grid gap-10 p-5 md:grid-cols-[minmax(0,1fr)_240px] md:gap-12 md:p-8 lg:p-10">
                         <div className="order-2 min-w-0 space-y-2 md:order-1">
+                            <header className="mb-6 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-5 md:px-6 md:py-6">
+                                <h1 className="text-2xl font-bold leading-snug text-slate-900 md:text-4xl md:leading-tight">
+                                    {essay.title}
+                                </h1>
+                                <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 md:text-lg md:leading-8">
+                                    {essay.lead}
+                                </p>
+                            </header>
                             <p className="rounded-xl border border-slate-100 bg-slate-50/90 px-4 py-3 text-sm leading-7 text-slate-600 md:text-base">
                                 {essay.metaDescription}
                             </p>
