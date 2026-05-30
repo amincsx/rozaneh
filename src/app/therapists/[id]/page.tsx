@@ -79,7 +79,7 @@ const mockTherapists: Therapist[] = [
     },
     {
         "id": "8",
-        "name": "رضا معیری",
+        "name": " دکتر رضا معیری ",
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/8/image (5).webp", "languages": ["فارسی"], "availableSlots": 10
     },
@@ -157,9 +157,33 @@ const mockTherapists: Therapist[] = [
     },
     {
         "id": "21",
-        "name": "بهاره نعمتی روشن",
+        "name": "منصوره روحانی فر",
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/21/21.webp", "languages": ["فارسی"], "availableSlots": 10
+    },
+    {
+        "id": "22",
+        "name": "سیده زهرا نوریزاده",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/22/22.webp", "languages": ["فارسی"], "availableSlots": 10
+    },
+    {
+        "id": "23",
+        "name": "فاطمه ماه روح ",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/23/23.webp", "languages": ["فارسی"], "availableSlots": 10
+    },
+    {
+        "id": "24",
+        "name": "یاسمن طبائیان ",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/24/24.webp", "languages": ["فارسی"], "availableSlots": 10
+    },
+    {
+        "id": "25",
+        "name": "محمد بدرخانی",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/25/25.webp", "languages": ["فارسی"], "availableSlots": 10
     }
 ]
 
