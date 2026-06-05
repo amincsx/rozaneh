@@ -67,7 +67,7 @@ const mockTherapists: Therapist[] = [
     },
     {
         "id": "6",
-        "name": "مینا خضری",
+        "name": "مینا خضری نمین",
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/6/image (3).webp", "languages": ["فارسی"], "availableSlots": 10
     },
@@ -145,7 +145,7 @@ const mockTherapists: Therapist[] = [
     },
     {
         "id": "19",
-        "name": "محمد جدیدکار همدانی",
+        "name": " دکتر محمد جدیدکار همدانی ",
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/19/image (16).webp", "languages": ["فارسی"], "availableSlots": 10
     },
@@ -181,9 +181,21 @@ const mockTherapists: Therapist[] = [
     },
     {
         "id": "25",
-        "name": "محمد بدرخانی",
+        "name": "دکتر محمد بدرخانی  ",
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "image": "/psychologists/25/25.webp", "languages": ["فارسی"], "availableSlots": 10
+    },
+    {
+        "id": "26",
+        "name": "دکتر اعظم گلستاتی  ",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/26/26.webp", "languages": ["فارسی"], "availableSlots": 10
+    },
+    {
+        "id": "27",
+        "name": "ساناز شاهوردی ",
+        "rating": 4.5, "experience": 10, "hourlyRate": 300000,
+        "image": "/psychologists/27/27.webp", "languages": ["فارسی"], "availableSlots": 10
     }
 ]
 
