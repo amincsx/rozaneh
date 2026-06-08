@@ -26,7 +26,7 @@ const mockTherapists: Therapist[] = [
     {
         "id": "4",
         "name": "دکتر محسن محمدی",
-        "specializations": ["عضو هیئت علمی دانشگاه", "مدیر مرکز مشاوره روزنه"],
+        "specializations": ["مدیر و مسئول فنی کلینیک مشاوره"],
         "rating": 4.5, "experience": 10, "hourlyRate": 300000,
         "bio": "دکترای تخصصی مشاوره -  مشاور و رواندرمانگر عضو هیئت علمی دانشگاه مدیر مرکز مشاوره روزنه",
         "image": "/psychologists/4/image (12).webp", "languages": ["فارسی"], "availableSlots": 10

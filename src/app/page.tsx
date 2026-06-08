@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
 import HomeNavbar from "@/components/HomeNavbar";
+import FeaturedEssaySlider from "@/components/FeaturedEssaySlider";
+import SmoothPageScroll from "@/components/SmoothPageScroll";
 
 export const metadata: Metadata = {
   title: "کلینیک روانشناسی روزنه - مشاوره آنلاین با بهترین متخصصان ایران",
@@ -38,7 +40,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="overflow-x-hidden">
+    <SmoothPageScroll>
       <style>{`
         .hero-first-section {
           background-image: url(/bg%201-01.svg);
@@ -103,7 +105,7 @@ export default function Home() {
       `}</style>
       {/* First Page */}
       <div
-        className="hero-first-section font-sans w-full h-screen bg-cover bg-top bg-left relative overflow-hidden"
+        className="scroll-section hero-first-section font-sans w-full h-screen bg-cover bg-top bg-left relative overflow-hidden snap-start snap-always"
       >
         {/* Logo */}
         <div className="absolute top-4 md:top-8 left-1/2 transform -translate-x-1/2 z-10 text-center">
@@ -142,9 +144,12 @@ export default function Home() {
 
       </div>
 
-      {/* Second Page */}
+      {/* Second Page: Essay Slider */}
+      <FeaturedEssaySlider />
+
+      {/* Third Page */}
       <div
-        className="hero-second-section font-sans w-full h-[vh] md:h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden"
+        className="scroll-section hero-second-section font-sans w-full h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden snap-start snap-always"
       >
         {/* Heading */}
         <h3 dir="rtl" className="absolute top-16 md:top-32 right-4 md:right-12 lg:right-20 3xl:right-56 text-right font-bold text-teal-700 text-base md:text-2xl lg:text-3xl font-arabic max-w-[calc(100vw-2rem)] px-2">
@@ -168,26 +173,26 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Third Page */}
+      {/* Fourth Page */}
       <div
-        className="hero-third-section font-sans w-full h-[40vh] md:h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden"
+        className="scroll-section hero-third-section font-sans w-full h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden snap-start snap-always"
       >
         {/* Free Online Tests Heading */}
-        <h1 dir="rtl" className="absolute top-0 md:top-1/2 left-1/2 transform -translate-x-1/2 md:translate-x-90 md:translate-y-12 text-center font-bold text-teal-700 text-base md:text-2xl lg:text-4xl font-arabic px-4 max-w-[90vw] z-10">
+        <h1 dir="rtl" className="absolute top-16 md:top-32 right-4 md:right-12 lg:right-20 3xl:right-56 text-right font-bold text-teal-700 text-base md:text-2xl lg:text-3xl font-arabic max-w-[calc(100vw-2rem)] px-2">
           تست های رایگان آنلاین
         </h1>
-        <p dir="rtl" className="absolute top-8 md:top-1/2 left-1/2 transform -translate-x-1/2 md:translate-x-75 md:translate-y-24 text-center text-gray-700 leading-relaxed font-regular text-xs md:text-base 4xl:text-2xl font-arabic max-w-xs md:max-w-md px-4 z-10">
+        <p dir="rtl" className="absolute top-32 md:top-52 right-4 md:right-12 lg:right-20 3xl:right-56 text-right text-gray-700 leading-relaxed font-regular text-xs md:text-base 4xl:text-2xl font-arabic max-w-xs md:max-w-md px-2">
           به‌روزترین و معتبرترین تست‌های روانشناسی به صورت کاملاً رایگان.
         </p>
 
         {/* Button */}
-        <Link href="/assessments" className="absolute top-20 md:top-1/2 left-1/2 transform -translate-x-1/2 md:translate-x-110 md:translate-y-40 bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-light px-4 py-2 md:px-6 md:py-3 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm md:text-base font-arabic inline-block z-10">
+        <Link href="/assessments" className="absolute top-48 md:top-72 right-4 md:right-12 lg:right-20 3xl:right-56 bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-light px-4 py-2 md:px-6 md:py-3 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm md:text-base font-arabic inline-block z-10">
           مشاهده تست‌ها
         </Link>
       </div>
 
       {/* Modern Photo Album Section */}
-      <section className="w-full py-8 md:py-16 flex flex-col items-center">
+      <section className="scroll-section w-full py-8 md:py-16 flex flex-col items-center snap-start snap-always">
         <h2 className="text-2xl md:text-4xl font-bold text-teal-700 mb-4 md:mb-8 font-arabic text-center mt-4 md:mt-8 px-4"> تصاویر کلینیک روزنه</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-6 max-w-6xl w-full px-2 md:px-4 mb-4 md:mb-8">
           {(() => {
@@ -212,7 +217,7 @@ export default function Home() {
       </section>
 
       {/* Modern Footer */}
-      <footer className="w-full py-4 md:py-6 px-2 md:px-4 mt-8 md:mt-12 flex justify-center">
+      <footer className="scroll-section w-full py-4 md:py-6 px-2 md:px-4 mt-8 md:mt-12 flex justify-center snap-start snap-always">
         <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm max-w-6xl w-full flex flex-col md:flex-row md:justify-between md:items-center gap-4 md:gap-8 px-4 md:px-6 py-4 md:py-6">
           <div className="flex flex-col items-center md:items-start gap-2">
             <img src="/logo.svg" alt="Rozaneh Logo" className="w-10 h-10 md:w-14 md:h-14 mb-1 md:mb-2" />
@@ -240,6 +245,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+    </SmoothPageScroll>
   );
 }

@@ -211,6 +211,7 @@ export default function TherapistProfilePage() {
     const [therapistCV, setTherapistCV] = useState<typeof therapistsCVData[0] | null>(null)
 
     const cvText = therapistCV?.rawCv?.trim() || ''
+    const cvHtml = cvText.replace(/\n/g, "<br />")
 
     useEffect(() => {
         const found = mockTherapists.find(t => t.id === therapistId)
@@ -402,9 +403,10 @@ export default function TherapistProfilePage() {
                         </h2>
 
                         <div className="bg-white/30 backdrop-blur-lg border border-white/50 rounded-xl p-6">
-                            <p className="text-slate-700 font-farsi leading-relaxed whitespace-pre-wrap">
-                                {cvText || "اطلاعاتی برای نمایش وجود ندارد."}
-                            </p>
+                            <div
+                                className="text-slate-700 font-farsi leading-relaxed"
+                                dangerouslySetInnerHTML={{ __html: cvHtml || "اطلاعاتی برای نمایش وجود ندارد." }}
+                            />
                         </div>
                     </div>
 
