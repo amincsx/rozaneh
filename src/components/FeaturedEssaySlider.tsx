@@ -33,7 +33,7 @@ export default function FeaturedEssaySlider() {
                 <div className="mb-8 flex flex-col gap-4 md:flex-row-reverse md:items-end md:justify-between">
                     <div>
                         <h2 className="mt-2 text-3xl font-bold text-slate-900 font-arabic leading-tight">
-                            جدیدترین مقاله روزنه
+                            جدیدترین مقاله های روزنه
                         </h2>
                     </div>
                     <Link
