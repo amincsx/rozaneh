@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getDisplayEmail, getProfileMissingFields } from '@/lib/user-display';
 
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json() as {
             user_id: string;
-            email: string;
+            email?: string;
             updates: Record<string, unknown>;
         };
         const { user_id, email, updates } = body;
-
-        console.log('[UpdateProfile] Updating user:', { user_id, email, updates });
 
         if (!user_id && !email) {
             return NextResponse.json(
@@ -43,10 +42,11 @@ export async function PUT(request: NextRequest) {
             const fieldMapping: Record<string, string> = {
                 'name': 'name',
                 'phone': 'phone',
+                'email': 'email',
                 'address': 'address',
                 'date_of_birth': 'birthDate',
                 'gender': 'gender',
-                'city': 'address', // Map city to address for now
+                'city': 'address',
             };
 
             const updateData: Record<string, unknown> = {};
@@ -67,10 +67,23 @@ export async function PUT(request: NextRequest) {
                             continue;
                         }
                     } else if (dbField === 'gender' && value) {
-                        // Convert gender to uppercase enum value (MALE, FEMALE, OTHER)
                         const genderValue = String(value).toUpperCase();
                         if (['MALE', 'FEMALE', 'OTHER'].includes(genderValue)) {
                             updateData[dbField] = genderValue;
+                        }
+                    } else if (dbField === 'email' && value) {
+                        const emailValue = String(value).trim();
+                        if (emailValue.includes('@')) {
+                            const existing = await prisma.user.findUnique({
+                                where: { email: emailValue },
+                            });
+                            if (existing && existing.id !== user.id) {
+                                return NextResponse.json(
+                                    { success: false, message: 'این ایمیل قبلا ثبت شده است' },
+                                    { status: 409 }
+                                );
+                            }
+                            updateData[dbField] = emailValue;
                         }
                     } else if (value !== undefined && value !== null && value !== '') {
                         updateData[dbField] = value;
@@ -91,6 +104,14 @@ export async function PUT(request: NextRequest) {
             // Don't send password to client
             const { password, ...userWithoutPassword } = updatedUser;
 
+            const missingFields = getProfileMissingFields({
+                email: updatedUser.email,
+                phone: updatedUser.phone,
+                address: updatedUser.address,
+                birthDate: updatedUser.birthDate,
+                gender: updatedUser.gender,
+            });
+
             return NextResponse.json({
                 success: true,
                 message: 'پروفایل با موفقیت به‌روز شد',
@@ -98,14 +119,16 @@ export async function PUT(request: NextRequest) {
                     user_id: updatedUser.id,
                     id: updatedUser.id,
                     name: updatedUser.name,
-                    email: updatedUser.email,
+                    email: getDisplayEmail(updatedUser.email),
                     phone: updatedUser.phone,
                     address: updatedUser.address,
                     city: updatedUser.address,
                     date_of_birth: updatedUser.birthDate ? updatedUser.birthDate.toISOString().split('T')[0] : null,
-                    gender: updatedUser.gender,
+                    gender: updatedUser.gender?.toLowerCase() ?? null,
                     registration_date: updatedUser.createdAt,
                     role: updatedUser.role,
+                    profile_complete: missingFields.length === 0,
+                    missing_fields: missingFields,
                 }
             });
         } catch (error) {

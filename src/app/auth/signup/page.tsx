@@ -5,41 +5,122 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Eye, EyeOff, Mail, User, Phone } from "lucide-react"
+import { User, Phone } from "lucide-react"
+import { isPhoneOnlyEmail } from "@/lib/user-display"
 
 export default function SignUpPage() {
     const [formData, setFormData] = useState({
         name: "",
-        email: "",
-        phone: "",
-        password: "",
-        confirmPassword: ""
+        phone: ""
     })
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [otp, setOtp] = useState("")
+    const [step, setStep] = useState<"form" | "otp">("form")
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState("")
     const router = useRouter()
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const validateForm = (): string | false => {
+        if (!formData.name.trim()) {
+            setError("نام و نام خانوادگی الزامی است")
+            return false
+        }
+
+        const cleanedPhone = formData.phone.replace(/\D/g, "")
+        if (!cleanedPhone) {
+            setError("شماره تلفن الزامی است")
+            return false
+        }
+
+        const normalizedPhone = cleanedPhone.startsWith("98")
+            ? `0${cleanedPhone.slice(2)}`
+            : cleanedPhone.startsWith("0")
+                ? cleanedPhone
+                : `0${cleanedPhone}`
+
+        if (!/^0\d{10}$/.test(normalizedPhone)) {
+            setError("شماره تلفن باید 11 رقمی با 0 شروع شود")
+            return false
+        }
+
+        setFormData((prev) => ({ ...prev, phone: normalizedPhone }))
+        setError("")
+        return normalizedPhone
+    }
+
+    const requestOtp = async () => {
+        const normalizedPhone = validateForm()
+        if (!normalizedPhone) {
+            return false
+        }
+
         setIsLoading(true)
         setError("")
 
-        if (formData.password !== formData.confirmPassword) {
-            setError("رمز عبور و تکرار آن یکسان نیستند")
+        try {
+            const response = await fetch("/api/auth/send-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phoneNumber: normalizedPhone }),
+            })
+
+            const data = await response.json()
+            if (!response.ok || !data.success) {
+                setError(data.message || "خطا در ارسال کد تایید")
+                return false
+            }
+
+            setStep("otp")
+            setOtp("")
+            return true
+        } catch (error) {
+            console.error("[Signup] OTP request error:", error)
+            setError("خطا در ارسال کد تایید. لطفا دوباره تلاش کنید")
+            return false
+        } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setError("")
+
+        if (step === "form") {
+            const ok = await requestOtp()
+            if (ok) {
+                setError("")
+            }
             return
         }
 
-        if (formData.password.length < 8) {
-            setError("رمز عبور باید حداقل 8 کاراکتر باشد")
-            setIsLoading(false)
+        const normalizedPhone = formData.phone.replace(/\D/g, "").startsWith("0")
+            ? formData.phone.replace(/\D/g, "").slice(0, 11)
+            : `0${formData.phone.replace(/\D/g, "").slice(-10)}`
+
+        if (!otp.trim() || !/^\d{4,6}$/.test(otp)) {
+            setError("کد تایید باید 4 تا 6 رقم باشد")
             return
         }
+
+        setIsLoading(true)
 
         try {
-            // Use the universal signup endpoint
+            const verifyResponse = await fetch("/api/auth/verify-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    phoneNumber: normalizedPhone,
+                    otp,
+                    mode: "signup",
+                }),
+            })
+
+            const verifyData = await verifyResponse.json()
+            if (!verifyResponse.ok || !verifyData.success) {
+                setError(verifyData.message || "کد تایید اشتباه است")
+                return
+            }
+
             const response = await fetch("/api/auth/register-universal", {
                 method: "POST",
                 headers: {
@@ -47,37 +128,31 @@ export default function SignUpPage() {
                 },
                 body: JSON.stringify({
                     name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone,
-                    password: formData.password,
+                    phone: normalizedPhone,
                     userType: 'user',
                 }),
-            });
+            })
 
-            if (response.ok) {
-                const data = await response.json()
-                if (data.success && data.user) {
-                    // Store user info in localStorage for dashboard
-                    localStorage.setItem('user_id', data.user.user_id)
-                    localStorage.setItem('email', data.user.email)
-                    localStorage.setItem('name', data.user.name)
-                    localStorage.setItem('userType', data.user.userType)
-
-                    console.log('[Signup] Signup successful, stored user data:', data.user)
-
-                    // Redirect based on user type
-                    if (data.user.userType === 'therapist') {
-                        router.push("/therapist-dashboard")
-                    } else if (data.user.userType === 'employee') {
-                        router.push("/employee-dashboard")
-                    } else {
-                        router.push("/dashboard")
-                    }
+            const data = await response.json()
+            if (response.ok && data.success && data.user) {
+                localStorage.setItem('user_id', data.user.user_id)
+                localStorage.setItem('name', data.user.name || '')
+                localStorage.setItem('phone', data.user.phone || normalizedPhone)
+                if (data.user?.email && !isPhoneOnlyEmail(data.user.email)) {
+                    localStorage.setItem('email', data.user.email);
                 } else {
-                    setError(data.message || "خطا در ثبت نام")
+                    localStorage.removeItem('email');
+                }
+                localStorage.setItem('userType', data.user.userType || 'user')
+
+                if (data.user.userType === 'therapist') {
+                    router.push("/therapist-dashboard")
+                } else if (data.user.userType === 'employee') {
+                    router.push("/employee-dashboard")
+                } else {
+                    router.push("/dashboard")
                 }
             } else {
-                const data = await response.json()
                 setError(data.message || "خطا در ثبت نام")
             }
         } catch (error) {
@@ -88,10 +163,11 @@ export default function SignUpPage() {
         }
     }
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [name]: value,
         })
     }
 
@@ -118,7 +194,7 @@ export default function SignUpPage() {
                     <p className="mt-2 text-sm text-gray-600 font-arabic">
                         یا{" "}
                         <Link
-                            href="/auth/signin"
+                            href="/login"
                             className="font-medium text-teal-600 hover:text-teal-500"
                         >
                             وارد حساب موجود شوید
@@ -134,116 +210,74 @@ export default function SignUpPage() {
                             </div>
                         )}
 
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 font-arabic">
-                                نام و نام خانوادگی
-                            </label>
-                            <div className="mt-1 relative">
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    autoComplete="name"
-                                    required
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                    className="pl-10"
-                                    placeholder="نام کامل خود را وارد کنید"
-                                />
-                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            </div>
-                        </div>
+                        {step === "form" ? (
+                            <>
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 font-arabic">
+                                        نام و نام خانوادگی
+                                    </label>
+                                    <div className="mt-1 relative">
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            type="text"
+                                            autoComplete="name"
+                                            required
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            className="pl-10"
+                                            placeholder="نام کامل خود را وارد کنید"
+                                        />
+                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                    </div>
+                                </div>
 
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 font-arabic">
-                                ایمیل
-                            </label>
-                            <div className="mt-1 relative">
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    className="pl-10"
-                                    placeholder="example@email.com"
-                                />
-                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 font-arabic">
-                                شماره تلفن
-                            </label>
-                            <div className="mt-1 relative">
-                                <Input
-                                    id="phone"
-                                    name="phone"
-                                    type="tel"
-                                    autoComplete="tel"
-                                    value={formData.phone}
-                                    onChange={handleInputChange}
-                                    className="pl-10"
-                                    placeholder="09123456789"
-                                />
-                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 font-arabic">
-                                رمز عبور
-                            </label>
-                            <div className="mt-1 relative">
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type={showPassword ? "text" : "password"}
-                                    autoComplete="new-password"
-                                    required
-                                    value={formData.password}
-                                    onChange={handleInputChange}
-                                    className="pl-10"
-                                    placeholder="حداقل 8 کاراکتر"
-                                />
+                                <div>
+                                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 font-arabic">
+                                        شماره تلفن
+                                    </label>
+                                    <div className="mt-1 relative">
+                                        <Input
+                                            id="phone"
+                                            name="phone"
+                                            type="tel"
+                                            autoComplete="tel"
+                                            required
+                                            value={formData.phone}
+                                            onChange={handleInputChange}
+                                            className="pl-10"
+                                            placeholder="09123456789"
+                                        />
+                                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div>
+                                <label htmlFor="otp" className="block text-sm font-medium text-gray-700 font-arabic">
+                                    کد تایید ارسال شده به شماره {formData.phone}
+                                </label>
+                                <div className="mt-1">
+                                    <Input
+                                        id="otp"
+                                        name="otp"
+                                        type="text"
+                                        inputMode="numeric"
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                                        className="text-center tracking-widest"
+                                        placeholder="123456"
+                                    />
+                                </div>
                                 <button
                                     type="button"
-                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                                    onClick={() => setShowPassword(!showPassword)}
+                                    onClick={() => setStep("form")}
+                                    className="mt-2 text-sm text-teal-600 hover:text-teal-700"
                                 >
-                                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    تغییر شماره
                                 </button>
                             </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 font-arabic">
-                                تکرار رمز عبور
-                            </label>
-                            <div className="mt-1 relative">
-                                <Input
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    autoComplete="new-password"
-                                    required
-                                    value={formData.confirmPassword}
-                                    onChange={handleInputChange}
-                                    className="pl-10"
-                                    placeholder="رمز عبور را دوباره وارد کنید"
-                                />
-                                <button
-                                    type="button"
-                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                >
-                                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                </button>
-                            </div>
-                        </div>
+                        )}
 
                         <div className="flex items-center">
                             <input
@@ -272,7 +306,7 @@ export default function SignUpPage() {
                                 className="w-full font-arabic"
                                 disabled={isLoading}
                             >
-                                {isLoading ? "در حال ثبت نام..." : "ثبت نام"}
+                                {isLoading ? "در حال پردازش..." : step === "form" ? "ارسال کد تایید" : "تایید و ثبت نام"}
                             </Button>
                         </div>
                     </form>

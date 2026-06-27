@@ -10,7 +10,7 @@ export default function EmployeeDashboard() {
     useEffect(() => {
         const userType = localStorage.getItem('userType');
         if (userType !== 'employee') {
-            window.location.href = '/auth/signin';
+            window.location.href = '/login';
             return;
         }
 

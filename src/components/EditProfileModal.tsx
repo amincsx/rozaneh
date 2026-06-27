@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { toJalaali, toGregorian } from 'jalaali-js';
+import { getDisplayEmail } from '@/lib/user-display';
 
 interface User {
     user_id: string;
     name: string;
-    email: string;
+    email?: string | null;
     phone?: string;
     city?: string;
     address?: string;
@@ -15,7 +16,8 @@ interface User {
     gender?: string;
     profile_picture?: string;
     registration_date?: string;
-    [key: string]: string | undefined;
+    missing_fields?: string[];
+    [key: string]: string | string[] | undefined | null;
 }
 
 interface EditProfileModalProps {
@@ -25,7 +27,6 @@ interface EditProfileModalProps {
     onUpdate: (updatedUser: User) => void;
 }
 
-// Helper function to convert Gregorian date string to Jalaali
 const gregorianToJalaaliString = (gregorianDate: string): string => {
     if (!gregorianDate) return '';
     const [year, month, day] = gregorianDate.split('-').map(Number);
@@ -33,7 +34,6 @@ const gregorianToJalaaliString = (gregorianDate: string): string => {
     return `${jy}-${String(jm).padStart(2, '0')}-${String(jd).padStart(2, '0')}`;
 };
 
-// Helper function to convert Jalaali date string to Gregorian
 const jalaaliToGregorianString = (jalaaliDate: string): string => {
     if (!jalaaliDate) return '';
     const [year, month, day] = jalaaliDate.split('-').map(Number);
@@ -42,11 +42,6 @@ const jalaaliToGregorianString = (jalaaliDate: string): string => {
 };
 
 export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: EditProfileModalProps) {
-    // Convert stored Gregorian date to Jalaali for display
-    const jalaaliDateOfBirth = gregorianToJalaaliString(user.date_of_birth || '');
-    const initialParsed = jalaaliDateOfBirth ? jalaaliDateOfBirth.split('-').map(Number) : null;
-
-    // Get current Jalaali year as default
     const getDefaultJalaaliYear = () => {
         const now = new Date();
         const { jy } = toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate());
@@ -55,6 +50,7 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
 
     const [formData, setFormData] = useState({
         name: user.name || '',
+        email: getDisplayEmail(user.email) || '',
         phone: user.phone || '',
         city: user.city || '',
         address: user.address || '',
@@ -62,13 +58,35 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
         gender: user.gender || '',
     });
 
-    const [jalaaliDateInput, setJalaaliDateInput] = useState(jalaaliDateOfBirth);
+    const [jalaaliDateInput, setJalaaliDateInput] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [pickerYear, setPickerYear] = useState(initialParsed?.[0] || getDefaultJalaaliYear() - 20);
-    const [pickerMonth, setPickerMonth] = useState(initialParsed?.[1] || 1);
+    const [pickerYear, setPickerYear] = useState(getDefaultJalaaliYear() - 20);
+    const [pickerMonth, setPickerMonth] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const jalaaliDateOfBirth = gregorianToJalaaliString(user.date_of_birth || '');
+        const initialParsed = jalaaliDateOfBirth ? jalaaliDateOfBirth.split('-').map(Number) : null;
+
+        setFormData({
+            name: user.name || '',
+            email: getDisplayEmail(user.email) || '',
+            phone: user.phone || '',
+            city: user.city || '',
+            address: user.address || '',
+            date_of_birth: user.date_of_birth || '',
+            gender: user.gender || '',
+        });
+        setJalaaliDateInput(jalaaliDateOfBirth);
+        setPickerYear(initialParsed?.[0] || getDefaultJalaaliYear() - 20);
+        setPickerMonth(initialParsed?.[1] || 1);
+        setError(null);
+        setSuccess(null);
+    }, [isOpen, user]);
 
     const JALAALI_MONTHS = [
         "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
@@ -117,12 +135,12 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
 
         try {
             const user_id = localStorage.getItem('user_id');
-            const email = localStorage.getItem('email');
-            const userType = localStorage.getItem('userType') || 'user';
 
-            if (!user_id || !email) {
+            if (!user_id) {
                 throw new Error('اطلاعات کاربری یافت نشد');
             }
+
+            const { phone: _phone, ...updates } = formData;
 
             const response = await fetch('/api/auth/update-profile', {
                 method: 'PUT',
@@ -131,9 +149,7 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                 },
                 body: JSON.stringify({
                     user_id,
-                    email,
-                    userType,
-                    updates: formData,
+                    updates,
                 }),
             });
 
@@ -143,7 +159,13 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                 throw new Error(data.message || 'خطا در بروزرسانی پروفایل');
             }
 
-            setSuccess('پروفایل با موفقیت به‌روز شد');
+            if (data.user?.email) {
+                localStorage.setItem('email', data.user.email);
+            } else {
+                localStorage.removeItem('email');
+            }
+
+            setSuccess('اطلاعات با موفقیت ذخیره شد');
             onUpdate(data.user);
             setTimeout(() => {
                 onClose();
@@ -161,9 +183,11 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                {/* Header */}
                 <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-800 font-arabic">ویرایش پروفایل</h2>
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800 font-arabic">تکمیل اطلاعات پروفایل</h2>
+                        <p className="text-sm text-gray-500 mt-1 font-arabic">فیلدهای خالی را می‌توانید بعدا تکمیل کنید</p>
+                    </div>
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-gray-100 rounded-lg transition"
@@ -172,7 +196,6 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                     </button>
                 </div>
 
-                {/* Content */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {error && (
                         <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg font-arabic">
@@ -187,7 +210,6 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Name */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">نام و نام خانوادگی</label>
                             <input
@@ -200,23 +222,33 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                             />
                         </div>
 
-                        {/* Phone */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">شماره تماس</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">شماره موبایل</label>
                             <input
                                 type="tel"
                                 name="phone"
                                 value={formData.phone}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                placeholder="09..."
+                                readOnly
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600"
                                 dir="ltr"
                             />
                         </div>
 
-                        {/* City */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">شهر</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">ایمیل (اختیاری)</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                placeholder="example@email.com"
+                                dir="ltr"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">شهر (اختیاری)</label>
                             <input
                                 type="text"
                                 name="city"
@@ -227,9 +259,8 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                             />
                         </div>
 
-                        {/* Date of Birth - Jalaali Calendar Picker */}
                         <div className="relative">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">تاریخ تولد (شمسی)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">تاریخ تولد (اختیاری)</label>
                             <button
                                 type="button"
                                 onClick={() => setShowDatePicker(!showDatePicker)}
@@ -240,7 +271,6 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
 
                             {showDatePicker && (
                                 <div className="absolute top-full right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50 w-80">
-                                    {/* Month/Year selector */}
                                     <div className="flex items-center justify-between mb-4">
                                         <button
                                             type="button"
@@ -276,7 +306,6 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                                         </button>
                                     </div>
 
-                                    {/* Calendar grid */}
                                     <div className="grid grid-cols-7 gap-1 text-center text-sm">
                                         {["ش", "ی", "د", "س", "چ", "پ", "ج"].map((day) => (
                                             <div key={day} className="font-bold text-gray-600 py-1">
@@ -289,12 +318,10 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                                             const firstDay = getFirstDayOfMonth(pickerYear, pickerMonth);
                                             const cells = [];
 
-                                            // Empty cells before month starts
                                             for (let i = 0; i < firstDay; i++) {
                                                 cells.push(<div key={`empty-${i}`} className="py-2" />);
                                             }
 
-                                            // Days of month
                                             for (let day = 1; day <= daysInMonth; day++) {
                                                 const isSelected = jalaaliDateInput === `${pickerYear}-${String(pickerMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                                                 cells.push(
@@ -316,7 +343,6 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                                         })()}
                                     </div>
 
-                                    {/* Close button */}
                                     <button
                                         type="button"
                                         onClick={() => setShowDatePicker(false)}
@@ -328,9 +354,8 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                             )}
                         </div>
 
-                        {/* Gender */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">جنسیت</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">جنسیت (اختیاری)</label>
                             <select
                                 name="gender"
                                 value={formData.gender}
@@ -345,9 +370,8 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                         </div>
                     </div>
 
-                    {/* Address */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">آدرس</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 font-arabic">آدرس (اختیاری)</label>
                         <input
                             type="text"
                             name="address"
@@ -358,14 +382,13 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                         />
                     </div>
 
-                    {/* Buttons */}
                     <div className="flex gap-4 pt-4 border-t border-gray-200">
                         <button
                             type="submit"
                             disabled={isLoading}
                             className="flex-1 bg-teal-600 text-white py-2 rounded-lg font-medium hover:bg-teal-700 transition disabled:opacity-50 font-arabic"
                         >
-                            {isLoading ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
+                            {isLoading ? 'در حال ذخیره...' : 'ذخیره اطلاعات'}
                         </button>
                         <button
                             type="button"

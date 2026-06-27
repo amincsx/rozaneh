@@ -1,48 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { normalizePhone } from '@/lib/otp';
+import { getDisplayEmail } from '@/lib/user-display';
 
 export async function POST(request: NextRequest) {
     console.log('[UniversalRegister] REGISTRATION REQUEST STARTED');
 
     try {
         console.log('[UniversalRegister] Parsing request body');
-        const { name, email, phone, password } = await request.json();
-        console.log('[UniversalRegister] Body parsed successfully - Users only');
+        const { name, phone, userType } = await request.json();
+        console.log('[UniversalRegister] Body parsed successfully - phone-only signup');
 
-        // Validation
-        if (!name || !email || !password) {
+        if (!name || !phone) {
             return NextResponse.json(
-                { success: false, message: 'نام، ایمیل و رمز عبور الزامی است' },
+                { success: false, message: 'نام و شماره تلفن الزامی است' },
                 { status: 400 }
             );
         }
 
-        if (password.length < 8) {
+        const normalizedPhone = normalizePhone(phone);
+        if (!/^0\d{10}$/.test(normalizedPhone)) {
             return NextResponse.json(
-                { success: false, message: 'رمز عبور باید حداقل 8 کاراکتر باشد' },
+                { success: false, message: 'شماره تلفن باید 11 رقمی با 0 شروع شود' },
                 { status: 400 }
             );
         }
 
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return NextResponse.json(
-                { success: false, message: 'ایمیل نامعتبر است' },
-                { status: 400 }
-            );
-        }
-
-        // Check if user email already exists
         try {
-            const existingUser = await prisma.user.findUnique({
-                where: { email }
+            const existingUser = await prisma.user.findFirst({
+                where: { phone: normalizedPhone }
             });
 
             if (existingUser) {
                 return NextResponse.json(
-                    { success: false, message: 'کاربری با این ایمیل قبلا ثبت نام کرده است' },
+                    { success: false, message: 'شماره تلفن قبلا ثبت شده است' },
                     { status: 400 }
                 );
             }
@@ -57,25 +48,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Hash password with bcrypt
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        // Create user
-        console.log('[UniversalRegister] Creating user:', email);
         try {
             const newUser = await prisma.user.create({
                 data: {
                     name,
-                    email,
-                    phone: phone || null,
-                    password: hashedPassword,
-                    role: 'PATIENT'
+                    email: normalizedPhone,
+                    phone: normalizedPhone,
+                    role: userType === 'therapist' ? 'THERAPIST' : 'PATIENT'
                 }
             });
 
             console.log('[UniversalRegister] ✓ User created successfully:', newUser.id);
 
-            // Return user without password
             const { password: _, ...userWithoutPassword } = newUser;
 
             return NextResponse.json(
@@ -84,8 +68,9 @@ export async function POST(request: NextRequest) {
                     message: 'ثبت نام با موفقیت انجام شد',
                     user: {
                         ...userWithoutPassword,
+                        email: getDisplayEmail(newUser.email),
                         user_id: newUser.id,
-                        userType: 'user'
+                        userType: userType === 'therapist' ? 'therapist' : 'user'
                     }
                 },
                 { status: 201 }

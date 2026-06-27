@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import EditProfileModal from "@/components/EditProfileModal";
 import PersianCalendar from "@/components/PersianCalendar";
+import { getDisplayEmail, isPhoneOnlyEmail } from "@/lib/user-display";
 
 interface User {
     user_id: string;
     name: string;
-    email: string;
+    email?: string | null;
     phone?: string;
     city?: string;
     address?: string;
@@ -17,7 +18,9 @@ interface User {
     bio?: string;
     profile_picture?: string;
     registration_date?: string;
-    [key: string]: string | undefined;
+    profile_complete?: boolean;
+    missing_fields?: string[];
+    [key: string]: string | boolean | string[] | undefined | null;
 }
 
 interface Appointment {
@@ -53,11 +56,17 @@ export default function UserDashboard() {
 
                 // Get user_id or email from localStorage (set during login)
                 const user_id = localStorage.getItem('user_id');
-                const email = localStorage.getItem('email');
+                const phone = localStorage.getItem('phone');
+                const storedEmail = localStorage.getItem('email');
+                const email = storedEmail && !isPhoneOnlyEmail(storedEmail) ? storedEmail : null;
 
-                if (!user_id && !email) {
+                if (storedEmail && isPhoneOnlyEmail(storedEmail)) {
+                    localStorage.removeItem('email');
+                }
+
+                if (!user_id && !phone && !email) {
                     setError('لطفا ابتدا وارد حساب کاربری شوید');
-                    window.location.href = '/auth/signin';
+                    window.location.href = '/login';
                     return;
                 }
 
@@ -66,6 +75,7 @@ export default function UserDashboard() {
                 // Fetch user profile
                 const profileUrl = new URL('/api/auth/user-profile', window.location.origin);
                 if (user_id) profileUrl.searchParams.append('user_id', user_id);
+                if (phone) profileUrl.searchParams.append('phone', phone);
                 if (email) profileUrl.searchParams.append('email', email);
 
                 const profileResponse = await fetch(profileUrl.toString());
@@ -80,6 +90,10 @@ export default function UserDashboard() {
 
                 console.log('[Dashboard] User data loaded:', profileData.user);
                 setUser(profileData.user);
+
+                if (!profileData.user.email) {
+                    localStorage.removeItem('email');
+                }
 
                 // TODO: Fetch appointments from database when appointments API is ready
                 // For now, show empty array
@@ -98,6 +112,28 @@ export default function UserDashboard() {
 
         fetchUserData();
     }, []);
+
+    const displayField = (value?: string | null) => {
+        if (!value || !value.trim()) return '';
+        return value;
+    };
+
+    const getGenderLabel = (gender?: string) => {
+        switch (gender) {
+            case 'male': return 'مرد';
+            case 'female': return 'زن';
+            case 'other': return 'سایر';
+            default: return '';
+        }
+    };
+
+    const missingFieldLabels: Record<string, string> = {
+        email: 'ایمیل',
+        city: 'شهر',
+        address: 'آدرس',
+        date_of_birth: 'تاریخ تولد',
+        gender: 'جنسیت',
+    };
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -133,7 +169,7 @@ export default function UserDashboard() {
             <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 flex items-center justify-center">
                 <div className="text-center bg-red-50 p-6 rounded-lg max-w-md">
                     <p className="text-red-600 mb-4">{error}</p>
-                    <Link href="/auth/signin" className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                    <Link href="/login" className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                         بازگشت به صفحه ورود
                     </Link>
                 </div>
@@ -146,7 +182,7 @@ export default function UserDashboard() {
             <div className="min-h-screen font-arabic bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-gray-600 mb-4">اطلاعات کاربر بارگذاری نشد</p>
-                    <Link href="/auth/signin" className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700">
+                    <Link href="/login" className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700">
                         بازگشت به صفحه ورود
                     </Link>
                 </div>
@@ -174,9 +210,11 @@ export default function UserDashboard() {
                         {/* Logout Button */}
                         <button
                             onClick={() => {
-                                // Clear stored session data
                                 localStorage.removeItem('user_id');
                                 localStorage.removeItem('email');
+                                localStorage.removeItem('phone');
+                                localStorage.removeItem('name');
+                                localStorage.removeItem('userType');
                                 window.location.href = '/';
                             }}
                             className="bg-red-500/80 backdrop-blur-sm border border-red-300/30 text-white font-light px-4 py-2 rounded-lg transition-all duration-300 hover:bg-red-600/90 hover:scale-105 shadow-sm text-sm"
@@ -221,6 +259,29 @@ export default function UserDashboard() {
                         </div>
                     </section>
 
+                    {/* Profile completion prompt */}
+                    {!user.profile_complete && (user.missing_fields?.length ?? 0) > 0 && (
+                        <section dir="rtl" className="mb-6">
+                            <div className="bg-amber-50/80 border border-amber-200 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <div>
+                                    <h3 className="font-bold text-amber-800 mb-1">پروفایل شما ناقص است</h3>
+                                    <p className="text-sm text-amber-700">
+                                        می‌توانید اطلاعات زیر را بعدا تکمیل کنید:{' '}
+                                        {(user.missing_fields || [])
+                                            .map((field) => missingFieldLabels[field] || field)
+                                            .join('، ')}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setIsEditModalOpen(true)}
+                                    className="shrink-0 bg-teal-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm"
+                                >
+                                    تکمیل اطلاعات
+                                </button>
+                            </div>
+                        </section>
+                    )}
+
                     {/* Profile and Quick Actions */}
                     <section dir="rtl" className="mb-8">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -228,37 +289,45 @@ export default function UserDashboard() {
                             <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-6 shadow-sm">
                                 <h2 className="text-xl font-bold text-teal-700 mb-6">اطلاعات پروفایل</h2>
                                 <div className="space-y-4">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">نام:</span>
-                                        <span className="font-medium text-gray-700">{user.name}</span>
+                                    <div className="flex justify-between gap-4">
+                                        <span className="text-gray-500 shrink-0">نام:</span>
+                                        <span className="font-medium text-gray-700 text-left">{displayField(user.name)}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">ایمیل:</span>
-                                        <span className="font-medium text-gray-700">{user.email}</span>
+                                    <div className="flex justify-between gap-4">
+                                        <span className="text-gray-500 shrink-0">شماره موبایل:</span>
+                                        <span className="font-medium text-gray-700" dir="ltr">{displayField(user.phone)}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">موبایل:</span>
-                                        <span className="font-medium text-gray-700" dir="ltr">{user.phone || '-'}</span>
+                                    <div className="flex justify-between gap-4">
+                                        <span className="text-gray-500 shrink-0">ایمیل:</span>
+                                        <span className="font-medium text-gray-700 text-left" dir="ltr">{displayField(getDisplayEmail(user.email) ?? undefined)}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">شهر:</span>
-                                        <span className="font-medium text-gray-700">{user.city || '-'}</span>
+                                    <div className="flex justify-between gap-4">
+                                        <span className="text-gray-500 shrink-0">شهر:</span>
+                                        <span className="font-medium text-gray-700 text-left">{displayField(user.city)}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">تاریخ تولد:</span>
+                                    <div className="flex justify-between gap-4">
+                                        <span className="text-gray-500 shrink-0">آدرس:</span>
+                                        <span className="font-medium text-gray-700 text-left">{displayField(user.address)}</span>
+                                    </div>
+                                    <div className="flex justify-between gap-4">
+                                        <span className="text-gray-500 shrink-0">جنسیت:</span>
+                                        <span className="font-medium text-gray-700">{getGenderLabel(user.gender)}</span>
+                                    </div>
+                                    <div className="flex justify-between gap-4">
+                                        <span className="text-gray-500 shrink-0">تاریخ تولد:</span>
                                         <span className="font-medium text-gray-700">
                                             {user.date_of_birth
                                                 ? new Date(user.date_of_birth).toLocaleDateString('fa-IR')
-                                                : '-'
+                                                : ''
                                             }
                                         </span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">تاریخ عضویت:</span>
+                                    <div className="flex justify-between gap-4">
+                                        <span className="text-gray-500 shrink-0">تاریخ عضویت:</span>
                                         <span className="font-medium text-gray-700">
                                             {user.registration_date
                                                 ? new Date(user.registration_date).toLocaleDateString('fa-IR')
-                                                : '-'
+                                                : ''
                                             }
                                         </span>
                                     </div>
@@ -267,7 +336,7 @@ export default function UserDashboard() {
                                     onClick={() => setIsEditModalOpen(true)}
                                     className="w-full mt-6 bg-teal-600 text-white py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm"
                                 >
-                                    ویرایش پروفایل
+                                    {user.profile_complete ? 'ویرایش پروفایل' : 'تکمیل / ویرایش اطلاعات'}
                                 </button>
                             </div>
 

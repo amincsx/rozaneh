@@ -2,65 +2,181 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { isPhoneOnlyEmail } from "@/lib/user-display";
 
 export default function LoginPage() {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
-    const [showPassword, setShowPassword] = useState(false);
+    const [step, setStep] = useState<'phone' | 'otp'>('phone');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [otp, setOtp] = useState('');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);
+    const [resendTimer, setResendTimer] = useState(0);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-        // Clear error when user starts typing
-        if (errors[name as keyof typeof errors]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
-        }
-    };
-
-    const validateForm = () => {
+    // Validate phone number
+    const validatePhoneNumber = () => {
         const newErrors: Record<string, string> = {};
+        const cleanedPhone = phoneNumber.replace(/\D/g, '');
 
-        if (!formData.email.trim()) {
-            newErrors.email = 'ایمیل اجباری است';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'فرمت ایمیل صحیح نیست';
-        }
-        if (!formData.password) {
-            newErrors.password = 'رمز عبور اجباری است';
+        if (!cleanedPhone) {
+            newErrors.phone = 'شماره تلفن اجباری است';
+        } else if (!/^(?:0\d{10}|9\d{9})$/.test(cleanedPhone)) {
+            newErrors.phone = 'شماره تلفن باید 11 رقمی با 0 شروع شود یا 10 رقمی با 9 شروع شود';
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    // Validate OTP
+    const validateOtp = () => {
+        const newErrors: Record<string, string> = {};
+
+        if (!otp.trim()) {
+            newErrors.otp = 'کد تایید اجباری است';
+        } else if (!/^\d{4,6}$/.test(otp)) {
+            newErrors.otp = 'کد تایید باید 4 تا 6 رقم باشد';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const normalizePhoneInput = (phone: string) => {
+        const digits = phone.replace(/\D/g, '')
+        if (digits.startsWith('98')) return `0${digits.slice(2)}`
+        if (digits.startsWith('0')) return digits.slice(0, 11)
+        return `0${digits.slice(-10)}`
+    }
+
+    // Handle sending OTP
+    const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!validateForm()) {
+        if (!validatePhoneNumber()) {
             return;
         }
 
         setIsSubmitting(true);
 
         try {
-            // Here you would typically make an API call to authenticate the user
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+            const normalizedPhone = normalizePhoneInput(phoneNumber)
 
-            // Redirect to dashboard after successful login
-            window.location.href = '/dashboard';
+            const response = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: normalizedPhone })
+            });
+
+            if (response.ok) {
+                setPhoneNumber(normalizedPhone)
+                setStep('otp');
+                setOtpSent(true);
+                setResendTimer(60);
+                setErrors({});
+
+                // Countdown timer
+                const interval = setInterval(() => {
+                    setResendTimer(prev => {
+                        if (prev <= 1) {
+                            clearInterval(interval);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+            } else {
+                const data = await response.json();
+                setErrors({ phone: data.message || 'خطا در ارسال کد' });
+            }
         } catch (error: unknown) {
             console.error(error);
-            alert('ایمیل یا رمز عبور اشتباه است');
+            setErrors({ phone: 'خطا در ارسال کد. دوباره تلاش کنید' });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Handle OTP verification
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validateOtp()) {
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber, otp, mode: 'login' })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (data.user?.user_id) {
+                    localStorage.setItem('user_id', data.user.user_id);
+                    localStorage.setItem('name', data.user.name || '');
+                    localStorage.setItem('phone', data.user.phone || phoneNumber);
+                    if (data.user?.email && !isPhoneOnlyEmail(data.user.email)) {
+                        localStorage.setItem('email', data.user.email);
+                    } else {
+                        localStorage.removeItem('email');
+                    }
+                    localStorage.setItem('userType', data.user.userType || 'user');
+                }
+
+                const userType = data.user?.userType || 'user';
+                if (userType === 'therapist') {
+                    window.location.href = '/therapist-dashboard';
+                } else if (userType === 'employee') {
+                    window.location.href = '/employee-dashboard';
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            } else {
+                const data = await response.json();
+                setErrors({ otp: data.message || 'کد تایید اشتباه است' });
+            }
+        } catch (error: unknown) {
+            console.error(error);
+            setErrors({ otp: 'خطا در تایید کد. دوباره تلاش کنید' });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Handle resend OTP
+    const handleResendOtp = async () => {
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber })
+            });
+
+            if (response.ok) {
+                setResendTimer(60);
+                setErrors({});
+
+                const interval = setInterval(() => {
+                    setResendTimer(prev => {
+                        if (prev <= 1) {
+                            clearInterval(interval);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+            }
+        } catch (error: unknown) {
+            console.error(error);
+            setErrors({ otp: 'خطا در ارسال کد مجدد' });
         } finally {
             setIsSubmitting(false);
         }
@@ -73,72 +189,116 @@ export default function LoginPage() {
                 <div className="text-center mb-8">
                     <img src="/logo.svg" alt="Rozaneh Logo" className="w-16 h-16 object-contain mx-auto mb-2" />
                     <h1 className="text-3xl font-bold text-teal-700">کلینیک روزنه</h1>
-                    <p className="text-gray-600 mt-2">ورود کاربر</p>
+                    <p className="text-gray-600 mt-2">
+                        {step === 'phone' ? 'ورود با شماره تلفن' : 'تایید کد'}
+                    </p>
                 </div>
 
                 {/* Login Form */}
                 <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-8 shadow-sm mb-6">
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-right text-gray-700 font-medium mb-2">ایمیل</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                className={`w-full px-4 py-2 border rounded-lg bg-white/50 text-gray-800 placeholder-gray-500 focus:outline-none focus:bg-white/70 transition ${errors.email ? 'border-red-500' : 'border-white/30'
-                                    }`}
-                                placeholder="ایمیل خود را وارد کنید"
-                            />
-                            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-                        </div>
+                    {step === 'phone' ? (
+                        // Phone Number Step
+                        <form onSubmit={handleSendOtp} className="space-y-4">
+                            <div>
+                                <label className="block text-right text-gray-700 font-medium mb-2">
+                                    شماره تلفن خود را وارد کنید
+                                </label>
+                                <div className="relative">
 
-                        <div>
-                            <label className="block text-right text-gray-700 font-medium mb-2">رمز عبور</label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleInputChange}
-                                    className={`w-full px-4 py-2 pr-10 border rounded-lg bg-white/50 text-gray-800 placeholder-gray-500 focus:outline-none focus:bg-white/70 transition ${errors.password ? 'border-red-500' : 'border-white/30'
-                                        }`}
-                                    placeholder="رمز عبور خود را وارد کنید"
-                                />
+                                    <input
+                                        type="tel"
+                                        inputMode="numeric"
+                                        dir="ltr"
+                                        style={{ direction: 'ltr', textAlign: 'left' }}
+                                        value={phoneNumber}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, '');
+                                            // Remove leading 98 if present and keep only the last 10 digits
+                                            const cleaned = value.replace(/^98/, '').slice(-11);
+                                            setPhoneNumber(cleaned);
+                                            if (errors.phone) {
+                                                setErrors(prev => ({ ...prev, phone: '' }));
+                                            }
+                                        }}
+                                        className={`w-full px-4 py-3 pr-16 border rounded-lg bg-white/50 text-left text-gray-800 placeholder-gray-500 focus:outline-none focus:bg-white/70 transition text-lg ${errors.phone ? 'border-red-500' : 'border-white/30'
+                                            }`}
+                                        placeholder="09123456789"
+                                        maxLength={12}
+
+                                    />
+                                </div>
+                                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full bg-teal-600 text-white py-3 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? 'درحال ارسال...' : 'ارسال کد تایید'}
+                            </button>
+                        </form>
+                    ) : (
+                        // OTP Step
+                        <form onSubmit={handleVerifyOtp} className="space-y-4">
+                            <div className="text-center mb-6">
+                                <p className="text-gray-700 text-sm">
+                                    کد تایید برای <span className="font-medium">+98{phoneNumber}</span> ارسال شد
+                                </p>
                                 <button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                    onClick={() => {
+                                        setStep('phone');
+                                        setOtp('');
+                                        setErrors({});
+                                    }}
+                                    className="text-teal-600 text-sm hover:underline mt-2"
                                 >
-                                    {showPassword ? (
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    )}
+                                    تغییر شماره تلفن
                                 </button>
                             </div>
-                            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-                        </div>
 
-                        <div className="flex justify-between items-center">
-                            <Link href="/forgot-password" className="text-sm text-teal-600 hover:underline">
-                                رمز عبور را فراموش کرده‌اید؟
-                            </Link>
-                        </div>
+                            <div>
+                                <label className="block text-right text-gray-700 font-medium mb-2">
+                                    کد تایید را وارد کنید
+                                </label>
+                                <input
+                                    type="text"
+                                    value={otp}
+                                    onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, '');
+                                        setOtp(value.slice(0, 6));
+                                        if (errors.otp) {
+                                            setErrors(prev => ({ ...prev, otp: '' }));
+                                        }
+                                    }}
+                                    className={`w-full px-4 py-3 border rounded-lg bg-white/50 text-gray-800 placeholder-gray-500 focus:outline-none focus:bg-white/70 transition text-2xl text-center tracking-widest font-mono ${errors.otp ? 'border-red-500' : 'border-white/30'
+                                        }`}
+                                    placeholder="------"
+                                    maxLength={6}
+                                    dir="ltr"
+                                />
+                                {errors.otp && <p className="text-red-500 text-sm mt-1">{errors.otp}</p>}
+                            </div>
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full bg-teal-600 text-white py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isSubmitting ? 'در حال ورود...' : 'ورود'}
-                        </button>
-                    </form>
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full bg-teal-600 text-white py-3 rounded-lg font-medium hover:bg-teal-700 transition-colors shadow-sm mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? 'درحال تایید...' : 'تایید کد'}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleResendOtp}
+                                disabled={resendTimer > 0 || isSubmitting}
+                                className="w-full text-teal-600 py-2 rounded-lg font-medium hover:bg-teal-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {resendTimer > 0 ? `ارسال مجدد در ${resendTimer} ثانیه` : 'ارسال مجدد کد'}
+                            </button>
+                        </form>
+                    )}
                 </div>
 
                 {/* Links */}
@@ -146,7 +306,7 @@ export default function LoginPage() {
                     <p className="text-gray-700">
                         حساب کاربری ندارید؟{" "}
                         <Link href="/auth/signup" className="text-teal-600 font-medium hover:underline">
-                            ثبت نام
+                            ثبت نام با شماره تلفن
                         </Link>
                     </p>
                     <p className="text-gray-700">
