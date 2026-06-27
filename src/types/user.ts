@@ -12,5 +12,4 @@ export interface User {
     registration_date?: string;
     profile_complete?: boolean;
     missing_fields?: string[];
-    [key: string]: string | boolean | string[] | undefined | null;
 }
