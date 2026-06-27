@@ -5,23 +5,7 @@ import { useState, useEffect } from "react";
 import EditProfileModal from "@/components/EditProfileModal";
 import PersianCalendar from "@/components/PersianCalendar";
 import { getDisplayEmail, isPhoneOnlyEmail } from "@/lib/user-display";
-
-interface User {
-    user_id: string;
-    name: string;
-    email?: string | null;
-    phone?: string;
-    city?: string;
-    address?: string;
-    date_of_birth?: string;
-    gender?: string;
-    bio?: string;
-    profile_picture?: string;
-    registration_date?: string;
-    profile_complete?: boolean;
-    missing_fields?: string[];
-    [key: string]: string | boolean | string[] | undefined | null;
-}
+import type { User } from "@/types/user";
 
 interface Appointment {
     id: string;

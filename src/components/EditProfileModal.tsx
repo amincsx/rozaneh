@@ -4,21 +4,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { toJalaali, toGregorian } from 'jalaali-js';
 import { getDisplayEmail } from '@/lib/user-display';
-
-interface User {
-    user_id: string;
-    name: string;
-    email?: string | null;
-    phone?: string;
-    city?: string;
-    address?: string;
-    date_of_birth?: string;
-    gender?: string;
-    profile_picture?: string;
-    registration_date?: string;
-    missing_fields?: string[];
-    [key: string]: string | string[] | undefined | null;
-}
+import type { User } from "@/types/user";
 
 interface EditProfileModalProps {
     user: User;
@@ -330,8 +316,8 @@ export default function EditProfileModal({ user, isOpen, onClose, onUpdate }: Ed
                                                         type="button"
                                                         onClick={() => handleSelectDate(day)}
                                                         className={`py-2 rounded text-sm transition ${isSelected
-                                                                ? 'bg-teal-500 text-white font-bold'
-                                                                : 'hover:bg-teal-100 text-gray-800'
+                                                            ? 'bg-teal-500 text-white font-bold'
+                                                            : 'hover:bg-teal-100 text-gray-800'
                                                             }`}
                                                     >
                                                         {day}
