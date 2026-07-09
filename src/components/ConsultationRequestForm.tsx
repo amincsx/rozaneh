@@ -6,9 +6,10 @@ import { ArrowLeft, ArrowRight, CheckCircle, Clock, Phone, User } from "lucide-r
 import { toGregorian, toJalaali } from "jalaali-js"
 import {
     WORK_TIME_SLOTS,
+    getAvailableWorkTimeSlots,
     getTehranParts,
     isCallNowAvailable,
-    isFriday,
+    isWeeklyOff,
 } from "@/lib/working-hours"
 
 type ConsultationRequestFormProps = {
@@ -26,10 +27,19 @@ function gregorianDateString(year: number, month: number, day: number) {
     return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
 }
 
-function isPastGregorianDate(dateStr: string) {
+function isPastJalaliDate(dateStr: string) {
+    const [year, month, day] = dateStr.split("-").map(Number)
+    if (!year || !month || !day) return false
+
     const today = getTehranParts()
-    const todayStr = gregorianDateString(today.year, today.month, today.day)
-    return dateStr < todayStr
+    const todayJalali = toJalaali(today.year, today.month, today.day)
+    const selectedJalali = toJalaali(year, month, day)
+
+    return selectedJalali.jy < todayJalali.jy ||
+        (selectedJalali.jy === todayJalali.jy && (
+            selectedJalali.jm < todayJalali.jm ||
+            (selectedJalali.jm === todayJalali.jm && selectedJalali.jd < todayJalali.jd)
+        ))
 }
 
 export default function ConsultationRequestForm({
@@ -42,6 +52,10 @@ export default function ConsultationRequestForm({
     const [error, setError] = useState("")
     const [submitted, setSubmitted] = useState(false)
     const [callNowAvailable, setCallNowAvailable] = useState(false)
+    const [otp, setOtp] = useState("")
+    const [otpSent, setOtpSent] = useState(false)
+    const [otpLoading, setOtpLoading] = useState(false)
+    const [otpMessage, setOtpMessage] = useState("")
 
     const [formData, setFormData] = useState({
         name: "",
@@ -53,12 +67,20 @@ export default function ConsultationRequestForm({
         scheduledTime: "",
     })
 
-    const [pickerYear, setPickerYear] = useState(() => getTehranParts().year)
+    const [pickerYear, setPickerYear] = useState(() => {
+        const { jy } = toJalaali(getTehranParts().year, getTehranParts().month, getTehranParts().day)
+        return jy
+    })
     const [pickerMonth, setPickerMonth] = useState(() => {
-        const { jy, jm } = toJalaali(getTehranParts().year, getTehranParts().month, getTehranParts().day)
+        const { jm } = toJalaali(getTehranParts().year, getTehranParts().month, getTehranParts().day)
         return jm
     })
     const [pickerDay, setPickerDay] = useState<number | null>(null)
+
+    const normalizePhoneNumber = (phone: string) => {
+        const digits = phone.replace(/\D/g, "")
+        return digits.startsWith("0") ? digits.slice(0, 11) : `0${digits.slice(-10)}`
+    }
 
     useEffect(() => {
         const refreshAvailability = () => setCallNowAvailable(isCallNowAvailable())
@@ -77,12 +99,20 @@ export default function ConsultationRequestForm({
         }))
     }, [])
 
+    useEffect(() => {
+        if (formData.scheduledTime && !getAvailableWorkTimeSlots(formData.scheduledDate).includes(formData.scheduledTime)) {
+            setFormData((prev) => ({ ...prev, scheduledTime: "" }))
+        }
+    }, [formData.scheduledDate, formData.scheduledTime])
+
     const selectedJalaaliLabel = useMemo(() => {
         if (!formData.scheduledDate) return ""
         const [y, m, d] = formData.scheduledDate.split("-").map(Number)
         const { jy, jm, jd } = toJalaali(y, m, d)
         return `${jd} ${JALAALI_MONTHS[jm - 1]} ${jy}`
     }, [formData.scheduledDate])
+
+    const availableTimeSlots = useMemo(() => getAvailableWorkTimeSlots(formData.scheduledDate), [formData.scheduledDate])
 
     const calendarCells = useMemo(() => {
         const { gy, gm, gd } = toGregorian(pickerYear, pickerMonth, 1)
@@ -102,13 +132,39 @@ export default function ConsultationRequestForm({
         const dateStr = gregorianDateString(gy, gm, gd)
         const candidate = new Date(`${dateStr}T12:00:00+03:30`)
 
-        if (isFriday(candidate) || isPastGregorianDate(dateStr)) return
+        if (isWeeklyOff(candidate) || isPastJalaliDate(dateStr)) return
 
         setPickerDay(day)
         setFormData((prev) => ({ ...prev, scheduledDate: dateStr }))
     }
 
     const validateStep1 = () => {
+        if (formData.problem.trim().length < 10) {
+            setError("لطفا مشکل خود را با جزئیات بیشتر توضیح دهید")
+            return false
+        }
+        return true
+    }
+
+    const validateStep2 = () => {
+        if (!formData.callType) {
+            setError("زمان تماس را انتخاب کنید")
+            return false
+        }
+        if (formData.callType === "now" && !callNowAvailable) {
+            setError("تماس فوری فقط در ساعت ۹ صبح تا ۹ شب (غیر از سه‌شنبه) امکان‌پذیر است")
+            return false
+        }
+        if (formData.callType === "scheduled") {
+            if (!formData.scheduledDate || !formData.scheduledTime) {
+                setError("تاریخ و ساعت تماس را انتخاب کنید")
+                return false
+            }
+        }
+        return true
+    }
+
+    const validateStep3 = () => {
         if (!formData.name.trim()) {
             setError("نام و نام خانوادگی الزامی است")
             return false
@@ -118,36 +174,10 @@ export default function ConsultationRequestForm({
             setError("سن معتبر وارد کنید")
             return false
         }
-        const phoneDigits = formData.phone.replace(/\D/g, "")
-        if (!/^0\d{10}$/.test(phoneDigits.startsWith("0") ? phoneDigits : `0${phoneDigits.slice(-10)}`)) {
+        const normalizedPhone = normalizePhoneNumber(formData.phone)
+        if (!/^0\d{10}$/.test(normalizedPhone)) {
             setError("شماره تلفن معتبر وارد کنید")
             return false
-        }
-        return true
-    }
-
-    const validateStep2 = () => {
-        if (formData.problem.trim().length < 10) {
-            setError("لطفا مشکل خود را با جزئیات بیشتر توضیح دهید")
-            return false
-        }
-        return true
-    }
-
-    const validateStep3 = () => {
-        if (!formData.callType) {
-            setError("زمان تماس را انتخاب کنید")
-            return false
-        }
-        if (formData.callType === "now" && !callNowAvailable) {
-            setError("تماس فوری فقط در ساعات ۹ تا ۱۷ (غیر از جمعه) امکان‌پذیر است")
-            return false
-        }
-        if (formData.callType === "scheduled") {
-            if (!formData.scheduledDate || !formData.scheduledTime) {
-                setError("تاریخ و ساعت تماس را انتخاب کنید")
-                return false
-            }
         }
         return true
     }
@@ -164,16 +194,63 @@ export default function ConsultationRequestForm({
         setStep((prev) => Math.max(prev - 1, 1))
     }
 
+    const handleSendOtp = async () => {
+        setError("")
+        setOtpMessage("")
+
+        const normalizedPhone = normalizePhoneNumber(formData.phone)
+        if (!/^0\d{10}$/.test(normalizedPhone)) {
+            setError("شماره موبایل معتبر وارد کنید")
+            return
+        }
+
+        setOtpLoading(true)
+        try {
+            const response = await fetch("/api/auth/send-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phoneNumber: normalizedPhone, mode: "consultation" }),
+            })
+
+            const data = await response.json()
+            if (!response.ok || !data.success) {
+                setError(data.message || "خطا در ارسال کد تایید")
+                return
+            }
+
+            setOtpSent(true)
+            setOtp("")
+            setOtpMessage("کد تایید برای شماره شما ارسال شد")
+        } catch {
+            setError("خطا در ارسال کد تایید")
+        } finally {
+            setOtpLoading(false)
+        }
+    }
+
     const handleSubmit = async () => {
         setError("")
         if (!validateStep3()) return
 
+        const normalizedPhone = normalizePhoneNumber(formData.phone)
+        if (!otp.trim() || !/^\d{4,6}$/.test(otp)) {
+            setError("کد تایید باید 4 تا 6 رقم باشد")
+            return
+        }
+
         setLoading(true)
         try {
-            const phoneDigits = formData.phone.replace(/\D/g, "")
-            const normalizedPhone = phoneDigits.startsWith("0")
-                ? phoneDigits.slice(0, 11)
-                : `0${phoneDigits.slice(-10)}`
+            const verifyResponse = await fetch("/api/auth/verify-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phoneNumber: normalizedPhone, otp, mode: "consultation" }),
+            })
+
+            const verifyData = await verifyResponse.json()
+            if (!verifyResponse.ok || !verifyData.success) {
+                setError(verifyData.message || "کد تایید اشتباه است")
+                return
+            }
 
             const response = await fetch("/api/quick-consultation", {
                 method: "POST",
@@ -186,6 +263,8 @@ export default function ConsultationRequestForm({
                     callType: formData.callType,
                     scheduledDate: formData.scheduledDate,
                     scheduledTime: formData.scheduledTime,
+                    otp,
+                    otpVerifiedToken: verifyData.verifiedToken,
                     source,
                 }),
             })
@@ -235,9 +314,8 @@ export default function ConsultationRequestForm({
 
             <div className="flex items-center justify-center mb-8 gap-3">
                 {[1, 2, 3].map((n) => (
-                    <div key={n} className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                        step >= n ? "bg-teal-600 text-white" : "bg-gray-200 text-gray-500"
-                    }`}>
+                    <div key={n} className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= n ? "bg-teal-600 text-white" : "bg-gray-200 text-gray-500"
+                        }`}>
                         {n}
                     </div>
                 ))}
@@ -250,47 +328,6 @@ export default function ConsultationRequestForm({
             )}
 
             {step === 1 && (
-                <div className="space-y-5">
-                    <h2 className="text-xl font-bold text-teal-700 font-arabic flex items-center gap-2">
-                        <User className="w-5 h-5" /> اطلاعات تماس
-                    </h2>
-                    <div>
-                        <label className="block text-gray-700 font-semibold mb-2 font-arabic">نام و نام خانوادگی</label>
-                        <input
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-500"
-                            placeholder="نام کامل"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700 font-semibold mb-2 font-arabic">سن</label>
-                        <input
-                            type="number"
-                            min={1}
-                            max={120}
-                            value={formData.age}
-                            onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-500"
-                            placeholder="مثال: 28"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700 font-semibold mb-2 font-arabic">شماره موبایل</label>
-                        <input
-                            type="tel"
-                            dir="ltr"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 11) })}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-500 text-left"
-                            placeholder="09123456789"
-                        />
-                    </div>
-                </div>
-            )}
-
-            {step === 2 && (
                 <div className="space-y-5">
                     <h2 className="text-xl font-bold text-teal-700 font-arabic">شرح مشکل</h2>
                     <div>
@@ -308,40 +345,38 @@ export default function ConsultationRequestForm({
                 </div>
             )}
 
-            {step === 3 && (
+            {step === 2 && (
                 <div className="space-y-6">
                     <h2 className="text-xl font-bold text-teal-700 font-arabic flex items-center gap-2">
                         <Clock className="w-5 h-5" /> بهترین زمان تماس
                     </h2>
-                    <p className="text-sm text-gray-600 font-arabic">ساعات کاری: ۹ صبح تا ۵ عصر — جمعه‌ها تعطیل</p>
+                    <p className="text-sm text-gray-600 font-arabic">ساعات کاری: ۹ صبح تا ۹ شب — سه‌شنبه‌ها تعطیل</p>
 
                     <div className="space-y-3">
                         <button
                             type="button"
                             disabled={!callNowAvailable}
                             onClick={() => setFormData({ ...formData, callType: "now" })}
-                            className={`w-full p-4 rounded-xl border-2 text-right transition ${
-                                formData.callType === "now"
-                                    ? "border-teal-600 bg-teal-50"
-                                    : "border-gray-200 hover:border-teal-300"
-                            } ${!callNowAvailable ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`w-full p-4 rounded-xl border-2 text-right transition ${formData.callType === "now"
+                                ? "border-teal-600 bg-teal-50"
+                                : "border-gray-200 hover:border-teal-300"
+                                } ${!callNowAvailable ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
                             <div className="font-bold text-gray-900 font-arabic">همین الان</div>
                             <div className="text-sm text-gray-600 font-arabic mt-1">
                                 {callNowAvailable
                                     ? "درخواست تماس فوری در ساعات کاری"
-                                    : "فقط در ساعات ۹ تا ۱۷ (غیر از جمعه) فعال است"}
+                                    : "فقط در ساعات ۹ صبح تا ۹ شب (غیر از سه‌شنبه) فعال است"}
                             </div>
                         </button>
 
                         <button
                             type="button"
                             onClick={() => setFormData({ ...formData, callType: "scheduled" })}
-                            className={`w-full p-4 rounded-xl border-2 text-right transition ${
-                                formData.callType === "scheduled"
-                                    ? "border-teal-600 bg-teal-50"
-                                    : "border-gray-200 hover:border-teal-300"
-                            }`}
+                            className={`w-full p-4 rounded-xl border-2 text-right transition ${formData.callType === "scheduled"
+                                ? "border-teal-600 bg-teal-50"
+                                : "border-gray-200 hover:border-teal-300"
+                                }`}
                         >
                             <div className="font-bold text-gray-900 font-arabic">زمان دیگر</div>
                             <div className="text-sm text-gray-600 font-arabic mt-1">انتخاب تاریخ و ساعت از تقویم</div>
@@ -371,7 +406,7 @@ export default function ConsultationRequestForm({
                                         const { gy, gm, gd } = toGregorian(pickerYear, pickerMonth, day)
                                         const dateStr = gregorianDateString(gy, gm, gd)
                                         const candidate = new Date(`${dateStr}T12:00:00+03:30`)
-                                        const disabled = isFriday(candidate) || isPastGregorianDate(dateStr)
+                                        const disabled = isWeeklyOff(candidate) || isPastJalaliDate(dateStr)
                                         const selected = pickerDay === day && formData.scheduledDate === dateStr
                                         return (
                                             <button
@@ -379,11 +414,10 @@ export default function ConsultationRequestForm({
                                                 type="button"
                                                 disabled={disabled}
                                                 onClick={() => handleSelectDate(day)}
-                                                className={`py-2 rounded text-sm ${
-                                                    selected ? "bg-teal-600 text-white" :
+                                                className={`py-2 rounded text-sm ${selected ? "bg-teal-600 text-white" :
                                                     disabled ? "text-gray-300 cursor-not-allowed" :
-                                                    "hover:bg-teal-100 text-gray-800"
-                                                }`}
+                                                        "hover:bg-teal-100 text-gray-800"
+                                                    }`}
                                             >
                                                 {day}
                                             </button>
@@ -403,14 +437,94 @@ export default function ConsultationRequestForm({
                                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-500 font-arabic"
                                 >
                                     <option value="">انتخاب ساعت</option>
-                                    {WORK_TIME_SLOTS.map((slot) => (
+                                    {availableTimeSlots.map((slot) => (
                                         <option key={slot} value={slot}>{slot}</option>
                                     ))}
                                 </select>
-                                <p className="text-xs text-gray-500 mt-2 font-arabic">فقط بین ۹:۰۰ تا ۱۶:۳۰</p>
+                                <p className="text-xs text-gray-500 mt-2 font-arabic">فقط بین ۰۹:۰۰ تا ۲۰:۳۰</p>
                             </div>
                         </div>
                     )}
+                </div>
+            )}
+
+            {step === 3 && (
+                <div className="space-y-5">
+                    <h2 className="text-xl font-bold text-teal-700 font-arabic flex items-center gap-2">
+                        <User className="w-5 h-5" /> اطلاعات تماس و تایید هویت
+                    </h2>
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2 font-arabic">نام و نام خانوادگی</label>
+                        <input
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-500"
+                            placeholder="نام کامل"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2 font-arabic">سن</label>
+                        <input
+                            type="number"
+                            min={1}
+                            max={120}
+                            value={formData.age}
+                            onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-500"
+                            placeholder="مثال: 28"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2 font-arabic">شماره موبایل</label>
+                        <input
+                            type="tel"
+                            dir="ltr"
+                            value={formData.phone}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, "").slice(0, 11)
+                                setFormData({ ...formData, phone: value })
+                                setOtpSent(false)
+                                setOtp("")
+                                setOtpMessage("")
+                            }}
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-500 text-left"
+                            placeholder="09123456789"
+                        />
+                    </div>
+
+                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <button
+                                type="button"
+                                onClick={handleSendOtp}
+                                disabled={otpLoading}
+                                className="px-4 py-2 bg-teal-600 text-white rounded-lg font-arabic font-semibold hover:bg-teal-700 disabled:opacity-50"
+                            >
+                                {otpLoading ? "در حال ارسال..." : otpSent ? "ارسال مجدد کد" : "ارسال کد تایید"}
+                            </button>
+                            <p className="text-sm text-gray-600 font-arabic">کد تایید به شماره وارد شده ارسال می‌شود</p>
+                        </div>
+
+                        {otpMessage && (
+                            <p className="text-sm font-arabic text-gray-600">
+                                {otpMessage}
+                            </p>
+                        )}
+
+                        <div>
+                            <label className="block text-gray-700 font-semibold mb-2 font-arabic">کد تایید</label>
+                            <input
+                                type="text"
+                                dir="ltr"
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-500 text-left"
+                                placeholder="123456"
+                            />
+                        </div>
+
+                    </div>
                 </div>
             )}
 

@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, message: 'شماره تلفن باید 11 رقمی با 0 شروع شود' }, { status: 400 })
         }
 
-        const otpResult = await verifyOtp(normalizedPhone, String(otp).trim())
+        const otpResult = await verifyOtp(normalizedPhone, String(otp).trim(), mode === 'consultation' ? 'consultation' : 'login')
         if (!otpResult.valid) {
             return NextResponse.json({ success: false, message: otpResult.reason }, { status: 400 })
         }
@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
             success: true,
             message: 'شماره تلفن تایید شد',
             verified: true,
+            verifiedToken: otpResult.verifiedToken,
         })
     } catch (error) {
         console.error('[VerifyOtp] Error', error)

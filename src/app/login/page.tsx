@@ -49,6 +49,18 @@ export default function LoginPage() {
         return `0${digits.slice(-10)}`
     }
 
+    const formatPhoneForDisplay = (phone: string) => {
+        const digits = phone.replace(/\D/g, '')
+        if (!digits) return ''
+        if (digits.startsWith('98')) {
+            return `+98 ${digits.slice(2)}`
+        }
+        if (digits.startsWith('0')) {
+            return `+98 ${digits.slice(1)}`
+        }
+        return `+98 ${digits.slice(-10)}`
+    }
+
     // Handle sending OTP
     const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -243,7 +255,7 @@ export default function LoginPage() {
                         <form onSubmit={handleVerifyOtp} className="space-y-4">
                             <div className="text-center mb-6">
                                 <p className="text-gray-700 text-sm">
-                                    کد تایید برای <span className="font-medium">+98{phoneNumber}</span> ارسال شد
+                                    کد تایید برای <span className="font-medium">{formatPhoneForDisplay(phoneNumber)}</span> ارسال شد
                                 </p>
                                 <button
                                     type="button"

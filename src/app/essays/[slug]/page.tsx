@@ -158,6 +158,15 @@ export default async function EssayDetailsPage({ params }: PageProps) {
                                 <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 md:text-lg md:leading-8">
                                     {essay.lead}
                                 </p>
+                                <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                                    {essay.author ? <span className="rounded-full bg-white px-3 py-1">نویسنده: {essay.author}</span> : null}
+                                    {essay.publishedAt ? (
+                                        <span dir="rtl" className="rounded-full bg-white px-3 py-1 text-right">
+                                            تاریخ: {essay.publishedAt}
+                                        </span>
+                                    ) : null}
+                                    {essay.category ? <span className="rounded-full bg-teal-100 px-3 py-1 text-teal-700">{essay.category}</span> : null}
+                                </div>
                             </header>
                             <p className="rounded-xl border border-slate-100 bg-slate-50/90 px-4 py-3 text-sm leading-7 text-slate-600 md:text-base">
                                 {essay.metaDescription}

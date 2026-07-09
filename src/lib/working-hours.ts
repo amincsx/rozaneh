@@ -1,11 +1,12 @@
 export const WORK_TIMEZONE = 'Asia/Tehran'
 export const WORK_START_HOUR = 9
-export const WORK_END_HOUR = 17
+export const WORK_END_HOUR = 21
 
 export const WORK_TIME_SLOTS = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
     '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-    '15:00', '15:30', '16:00', '16:30',
+    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+    '18:00', '18:30', '19:00', '19:30', '20:00', '20:30',
 ]
 
 type TehranParts = {
@@ -48,13 +49,13 @@ export function getTehranParts(date = new Date()): TehranParts {
     }
 }
 
-export function isFriday(date = new Date()) {
-    return getTehranParts(date).weekday === 5
+export function isWeeklyOff(date = new Date()) {
+    return getTehranParts(date).weekday === 2
 }
 
 export function isWithinWorkingHours(date = new Date()) {
     const { hour, weekday } = getTehranParts(date)
-    if (weekday === 5) return false
+    if (weekday === 2) return false
     return hour >= WORK_START_HOUR && hour < WORK_END_HOUR
 }
 
@@ -66,6 +67,25 @@ export function isValidWorkTimeSlot(time: string) {
     return WORK_TIME_SLOTS.includes(time)
 }
 
+export function getAvailableWorkTimeSlots(date?: string) {
+    if (!date) return WORK_TIME_SLOTS
+
+    const [year, month, day] = date.split('-').map(Number)
+    const today = getTehranParts()
+
+    if (year !== today.year || month !== today.month || day !== today.day) {
+        return WORK_TIME_SLOTS
+    }
+
+    const currentMinutes = today.hour * 60 + today.minute
+
+    return WORK_TIME_SLOTS.filter((time) => {
+        const [hour, minute] = time.split(':').map(Number)
+        const slotMinutes = hour * 60 + minute
+        return slotMinutes > currentMinutes
+    })
+}
+
 export function buildScheduledDateTime(date: string, time: string): Date | null {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isValidWorkTimeSlot(time)) {
         return null
@@ -73,7 +93,7 @@ export function buildScheduledDateTime(date: string, time: string): Date | null 
 
     const scheduled = new Date(`${date}T${time}:00+03:30`)
     if (Number.isNaN(scheduled.getTime())) return null
-    if (isFriday(scheduled)) return null
+    if (isWeeklyOff(scheduled)) return null
 
     const { hour, minute } = getTehranParts(scheduled)
     const totalMinutes = hour * 60 + minute
