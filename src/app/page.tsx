@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import HomeNavbar from "@/components/HomeNavbar";
 import FeaturedEssaySlider from "@/components/FeaturedEssaySlider";
 import SmoothPageScroll from "@/components/SmoothPageScroll";
+import HeroCarousel from "@/components/HeroCarousel";
 
 export const metadata: Metadata = {
   title: "کلینیک روانشناسی روزنه - مشاوره آنلاین با بهترین متخصصان ایران",
@@ -122,25 +123,8 @@ export default function Home() {
         {/* Navigation Menu */}
         <HomeNavbar />
 
-        {/* Main Content */}
-        <div dir="rtl" className="absolute top-3/8 md:top-120 right-4 md:right-12 lg:right-20 3xl:right-56 transform -translate-y-1/2 text-right max-w-[calc(100vw-2rem)] md:max-w-lg 2xl:max-w-4xl 3xl:max-w-7xl font-arabic px-2">
-          <h1 className="font-bold text-teal-700 mb-3 md:mb-4 3xl:mb-12 leading-tight text-2xl md:text-4xl 4xl:text-6xl text-right">
-            سفر شما به سوی سلامت روان
-            <br />
-            از امروز شروع می‌شود.
-          </h1>
-          <p className="text-gray-600 mb-4 md:mb-6 3xl:mb-12 leading-relaxed font-regular text-sm md:text-base 4xl:text-2xl text-right">
-            در محیطی امن و حرفه‌ای همراه شما هستیم.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-2 md:gap-3 3xl:gap-8">
-            <Link href="/book-appointment" className="bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-light px-4 py-2 md:px-6 md:py-3 3xl:px-12 3xl:py-6 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm md:text-base 4xl:text-2xl text-center inline-block">
-              رزرو نوبت
-            </Link>
-            <Link href="/chat-support" className="bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-light px-4 py-2 md:px-6 md:py-3 3xl:px-12 3xl:py-6 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm md:text-base 4xl:text-2xl text-center inline-block">
-              مشاوره فوری
-            </Link>
-          </div>
-        </div>
+        {/* Main Content Carousel */}
+        <HeroCarousel />
 
       </div>
 

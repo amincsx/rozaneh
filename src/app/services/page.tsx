@@ -35,7 +35,8 @@ export default function ServicesPage() {
             title: "مشاوره شغلی",
             description: "راهنمایی برای انتخاب شغل مناسب و توسعه شغلی",
             category: "شغل",
-            image: "/services svg/مشاوره شغلی.svg"
+            image: "/services svg/مشاوره شغلی.svg",
+            href: "/services/job-counseling"
         },
         {
             title: "مشاوره تحصیلی",
@@ -173,31 +174,40 @@ export default function ServicesPage() {
                     {/* Services Grid - Section 3 */}
                     <section dir="rtl" className="py-4 px-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {services.slice(4).map((service, index) => (
-                                <div
-                                    key={index}
-                                    className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-3 shadow-sm hover:bg-white/30 hover:scale-[1.01] transition-all duration-300 cursor-pointer block group"
-                                >
-                                    {service.image && (
-                                        <img
-                                            src={service.image}
-                                            alt={service.title}
-                                            className="w-full h-80 object-contain rounded-lg mb-4 group-hover:scale-105 transition-transform"
-                                        />
-                                    )}
-                                    <div className="flex items-start justify-between mb-1">
-                                        <h3 className="text-2xl font-bold text-teal-700 flex-1">
-                                            {service.title}
-                                        </h3>
-                                        <span className="text-xs text-teal-600 font-medium bg-teal-50/50 px-2 py-1 rounded-full ml-2 whitespace-nowrap">
-                                            {service.category}
-                                        </span>
+                            {services.slice(4).map((service, index) => {
+                                const card = (
+                                    <div
+                                        className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-3 shadow-sm hover:bg-white/30 hover:scale-[1.01] transition-all duration-300 cursor-pointer block group"
+                                    >
+                                        {service.image && (
+                                            <img
+                                                src={service.image}
+                                                alt={service.title}
+                                                className="w-full h-80 object-contain rounded-lg mb-4 group-hover:scale-105 transition-transform"
+                                            />
+                                        )}
+                                        <div className="flex items-start justify-between mb-1">
+                                            <h3 className="text-2xl font-bold text-teal-700 flex-1">
+                                                {service.title}
+                                            </h3>
+                                            <span className="text-xs text-teal-600 font-medium bg-teal-50/50 px-2 py-1 rounded-full ml-2 whitespace-nowrap">
+                                                {service.category}
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-600 text-xl leading-relaxed">
+                                            {service.description}
+                                        </p>
                                     </div>
-                                    <p className="text-gray-600 text-xl leading-relaxed">
-                                        {service.description}
-                                    </p>
-                                </div>
-                            ))}
+                                )
+
+                                return service.href ? (
+                                    <Link key={index} href={service.href} className="block">
+                                        {card}
+                                    </Link>
+                                ) : (
+                                    <div key={index}>{card}</div>
+                                )
+                            })}
                         </div>
                     </section>
 

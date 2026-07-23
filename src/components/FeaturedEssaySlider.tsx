@@ -29,7 +29,7 @@ export default function FeaturedEssaySlider() {
 
     return (
         <section className="scroll-section relative w-full overflow-hidden h-screen snap-start snap-always bg-teal-50">
-            <div className="mx-auto flex h-full max-w-[90rem] flex-col justify-center px-4 py-20 sm:px-6 lg:px-8">
+            <div className="mx-auto flex h-full max-w-[90rem] 2xl:max-w-[90rem] flex-col justify-center px-4 py-20 sm:px-6 lg:px-8 2xl:px-10">
                 <div className="mb-8 flex flex-col gap-4 md:flex-row-reverse md:items-end md:justify-between">
                     <div>
                         <h2 className="mt-2 text-3xl font-bold text-slate-900 font-arabic leading-tight">
@@ -49,13 +49,14 @@ export default function FeaturedEssaySlider() {
                         href={`/essays/${essay.slug}`}
                         className="group block w-full overflow-hidden rounded-[2rem] border border-white/30 bg-white/30 border backdrop-blur-sm shadow-sm overflow-x-auto border-white  transition duration-300 hover:-translate-y-1"
                     >
-                        <div className="grid h-[min(60vh)] min-h-[100px] gap-0 grid-cols-1 grid-rows-[2fr_1fr] md:grid-cols-[1.3fr_1fr] md:grid-rows-none lg:grid-cols-[1.35fr_1fr]">
+                        <div className="grid min-h-[100px] gap-0 grid-cols-1 grid-rows-[auto_1fr] md:grid-cols-[1.3fr_1fr] md:grid-rows-none lg:grid-cols-[1.35fr_1fr]">
                             <div className="relative overflow-hidden bg-slate-100">
                                 <Image
                                     src={essay.image}
                                     alt={essay.title}
-                                    fill
-                                    className="object-cover transition-transform duration-700"
+                                    width={1200}
+                                    height={800}
+                                    className="w-full h-auto object-contain sm:object-cover transition-transform duration-700"
                                     style={{ objectPosition: essay.imagePosition?.card ?? "center center" }}
                                     sizes="(max-width: 768px) 100vw, 50vw"
                                 />
