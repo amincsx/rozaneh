@@ -121,7 +121,7 @@ export default function HeroCarousel() {
                 ))}
             </div>
 
-            <div className="flex flex-row  items-center justify-center sm:justify-start md:justify-start 2xl:justify-start gap-3 mt-6 md:mt-8">
+            <div className="flex flex-row  items-center justify-center sm:justify-start md:justify-start 2xl:justify-start gap-3 mt-0 md:mt-0">
                 <button
                     type="button"
                     onClick={goPrev}
