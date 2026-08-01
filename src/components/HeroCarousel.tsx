@@ -62,7 +62,7 @@ const slides: HeroSlide[] = [
 const AUTOPLAY_MS = 6000
 
 const buttonClass =
-    "bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-light px-4 py-2 md:px-6 md:py-3 3xl:px-12 3xl:py-6 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm md:text-base 4xl:text-2xl text-center inline-block"
+    "bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-regular px-4 py-2 md:px-6 md:py-3 3xl:px-12 3xl:py-6 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm md:text-base 4xl:text-2xl text-center inline-block"
 
 export default function HeroCarousel() {
     const [activeIndex, setActiveIndex] = useState(0)
