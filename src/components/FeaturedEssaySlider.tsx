@@ -28,7 +28,7 @@ export default function FeaturedEssaySlider() {
     const essay = essays[currentIndex]
 
     return (
-        <section className="scroll-section relative w-full overflow-hidden h-screen snap-start snap-always bg-teal-50">
+        <section className="scroll-section relative w-full overflow-hidden h-screen bg-teal-50">
             <div className="mx-auto flex h-full max-w-[90rem] 2xl:max-w-[90rem] flex-col justify-center px-4 py-20 sm:px-6 lg:px-8 2xl:px-10">
                 <div className="mb-8 flex flex-col gap-4 md:flex-row-reverse md:items-end md:justify-between">
                     <div>

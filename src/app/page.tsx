@@ -106,7 +106,7 @@ export default function Home() {
       `}</style>
       {/* First Page */}
       <div
-        className="scroll-section hero-first-section font-sans w-full h-screen bg-cover bg-top bg-left relative overflow-hidden snap-start snap-always"
+        className="scroll-section hero-first-section font-sans w-full h-screen bg-cover bg-top bg-left relative overflow-hidden"
       >
         {/* Logo */}
         <div className="absolute top-4 md:top-8 left-1/2 transform -translate-x-1/2 z-10 text-center">
@@ -133,7 +133,7 @@ export default function Home() {
 
       {/* Third Page */}
       <div
-        className="scroll-section hero-second-section font-sans w-full h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden snap-start snap-always"
+        className="scroll-section hero-second-section font-sans w-full h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden"
       >
         {/* Heading */}
         <h3 dir="rtl" className="absolute top-16 md:top-32 right-4 md:right-12 lg:right-20 3xl:right-56 text-right font-bold text-teal-700 text-base md:text-2xl lg:text-3xl font-arabic max-w-[calc(100vw-2rem)] px-2">
@@ -159,7 +159,7 @@ export default function Home() {
 
       {/* Fourth Page */}
       <div
-        className="scroll-section hero-third-section font-sans w-full h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden snap-start snap-always"
+        className="scroll-section hero-third-section font-sans w-full h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden"
       >
         {/* Free Online Tests Heading */}
         <h1 dir="rtl" className="absolute top-16 md:top-32 right-4 md:right-12 lg:right-20 3xl:right-56 text-right font-bold text-teal-700 text-base md:text-2xl lg:text-3xl font-arabic max-w-[calc(100vw-2rem)] px-2">
@@ -176,7 +176,7 @@ export default function Home() {
       </div>
 
       {/* Modern Photo Album Section */}
-      <section className="scroll-section w-full py-8 md:py-16 flex flex-col items-center snap-start snap-always">
+      <section className="scroll-section w-full py-8 md:py-16 flex flex-col items-center">
         <h2 className="text-2xl md:text-4xl font-bold text-teal-700 mb-4 md:mb-8 font-arabic text-center mt-4 md:mt-8 px-4"> تصاویر کلینیک روزنه</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-6 max-w-6xl w-full px-2 md:px-4 mb-4 md:mb-8">
           {(() => {
@@ -201,7 +201,7 @@ export default function Home() {
       </section>
 
       {/* Modern Footer */}
-      <footer className="scroll-section w-full py-4 md:py-6 px-2 md:px-4 mt-8 md:mt-12 flex justify-center snap-start snap-always">
+      <footer className="scroll-section w-full py-4 md:py-6 px-2 md:px-4 mt-8 md:mt-12 flex justify-center">
         <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm max-w-6xl w-full flex flex-col md:flex-row md:justify-between md:items-center gap-4 md:gap-8 px-4 md:px-6 py-4 md:py-6">
           <div className="flex flex-col items-center md:items-start gap-2">
             <img src="/logo.svg" alt="Rozaneh Logo" className="w-10 h-10 md:w-14 md:h-14 mb-1 md:mb-2" />
