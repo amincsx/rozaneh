@@ -134,16 +134,18 @@ export default async function EssayDetailsPage({ params }: PageProps) {
 
             <div className="mx-auto max-w-5xl px-4 pt-8 md:px-6 md:pt-10">
                 <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    <div className="relative h-56 w-full bg-slate-100 sm:h-72 md:h-96">
+                    <div
+                        className="relative min-h-[220px] w-full bg-slate-100 sm:min-h-[360px] md:min-h-[520px]"
+                        style={{ aspectRatio: "1920 / 1080" }}
+                    >
                         <Image
                             src={essay.image}
                             alt={essay.title}
                             fill
                             priority
-                            className="object-cover"
+                            className="object-contain"
                             style={{
                                 objectPosition: essay.imagePosition?.hero ?? essay.imagePosition?.card ?? "center center",
-                                transform: `scale(${essay.imageScale?.hero ?? essay.imageScale?.card ?? 1})`,
                             }}
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
