@@ -211,6 +211,28 @@ model ConsultationRequest {
   @@map("consultation_requests")
 }
 
+model Essay {
+  id             Int      @id
+  slug           String   @unique
+  title          String
+  seoTitle       String
+  metaDescription String
+  author         String?
+  publishedAt    String?
+  category       String?
+  image          String
+  imagePosition  Json?
+  imageScale     Json?
+  lead           String
+  body           Json
+  isPublished    Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([isPublished, id])
+  @@map("essays")
+}
+
 enum CommentStatus {
   PENDING
   APPROVED

@@ -1,9 +1,12 @@
 import { MetadataRoute } from 'next'
-import { essaysData } from './essays/essaysData'
+import { getPublishedEssays } from '@/lib/essays'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const dynamic = 'force-dynamic'
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://rozanehclinic.com'
-    const essayEntries: MetadataRoute.Sitemap = essaysData.map((essay) => ({
+    const essays = await getPublishedEssays()
+    const essayEntries: MetadataRoute.Sitemap = essays.map((essay) => ({
         url: `${baseUrl}/essays/${essay.slug}`,
         lastModified: new Date(),
         changeFrequency: 'monthly',

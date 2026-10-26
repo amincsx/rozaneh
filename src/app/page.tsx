@@ -6,6 +6,8 @@ import FeaturedEssaySlider from "@/components/FeaturedEssaySlider";
 import SmoothPageScroll from "@/components/SmoothPageScroll";
 import HeroCarousel from "@/components/HeroCarousel";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "کلینیک روانشناسی روزنه - مشاوره آنلاین با بهترین متخصصان ایران",
   description: "کلینیک روزنه بهترین مرکز مشاوره آنلاین ایران. رزرو نوبت آنلاین، مشاوره فوری، تست‌های روانشناختی رایگان و خدمات تخصصی با روانشناسان مجرب",

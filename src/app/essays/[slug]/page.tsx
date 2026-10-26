@@ -3,15 +3,17 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { EssayBlock } from "../essaysData";
-import { essaysData } from "../essaysData";
+import { getPublishedEssayBySlug } from "@/lib/essays";
 
 type PageProps = {
     params: Promise<{ slug: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const essay = essaysData.find((item) => item.slug === slug);
+    const essay = await getPublishedEssayBySlug(slug);
     if (!essay) {
         return { title: "مقاله یافت نشد" };
     }
@@ -113,7 +115,7 @@ function renderBlock(block: EssayBlock, index: number) {
 
 export default async function EssayDetailsPage({ params }: PageProps) {
     const { slug } = await params;
-    const essay = essaysData.find((item) => item.slug === slug);
+    const essay = await getPublishedEssayBySlug(slug);
 
     if (!essay) {
         notFound();
