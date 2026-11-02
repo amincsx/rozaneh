@@ -75,6 +75,16 @@ export async function getPublishedEssays(): Promise<Essay[]> {
     return rows.map(mapEssay);
 }
 
+export async function getLatestPublishedEssays(limit: number): Promise<Essay[]> {
+    const rows = await prisma.essay.findMany({
+        where: { isPublished: true },
+        orderBy: { id: "desc" },
+        take: limit,
+    });
+
+    return rows.map(mapEssay).reverse();
+}
+
 export async function getPublishedEssayBySlug(slug: string): Promise<Essay | null> {
     const row = await prisma.essay.findFirst({
         where: { slug, isPublished: true },
