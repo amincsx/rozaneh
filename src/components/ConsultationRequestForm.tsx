@@ -152,7 +152,7 @@ export default function ConsultationRequestForm({
             return false
         }
         if (formData.callType === "now" && !callNowAvailable) {
-            setError("تماس فوری فقط در ساعت ۹ صبح تا ۹ شب (غیر از سه‌شنبه) امکان‌پذیر است")
+            setError("تماس فوری فقط در ساعت ۹ صبح تا ۹ شب (غیر از جمعه) امکان‌پذیر است")
             return false
         }
         if (formData.callType === "scheduled") {
@@ -350,7 +350,7 @@ export default function ConsultationRequestForm({
                     <h2 className="text-xl font-bold text-teal-700 font-arabic flex items-center gap-2">
                         <Clock className="w-5 h-5" /> بهترین زمان تماس
                     </h2>
-                    <p className="text-sm text-gray-600 font-arabic">ساعات کاری: ۹ صبح تا ۹ شب — سه‌شنبه‌ها تعطیل</p>
+                    <p className="text-sm text-gray-600 font-arabic">ساعات کاری: ۹ صبح تا ۹ شب — جمعه‌ها تعطیل</p>
 
                     <div className="space-y-3">
                         <button
@@ -366,7 +366,7 @@ export default function ConsultationRequestForm({
                             <div className="text-sm text-gray-600 font-arabic mt-1">
                                 {callNowAvailable
                                     ? "درخواست تماس فوری در ساعات کاری"
-                                    : "فقط در ساعات ۹ صبح تا ۹ شب (غیر از سه‌شنبه) فعال است"}
+                                    : "فقط در ساعات ۹ صبح تا ۹ شب (غیر از جمعه) فعال است"}
                             </div>
                         </button>
 

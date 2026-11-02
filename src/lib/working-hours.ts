@@ -1,6 +1,7 @@
 export const WORK_TIMEZONE = 'Asia/Tehran'
 export const WORK_START_HOUR = 9
 export const WORK_END_HOUR = 21
+const WEEKLY_OFF_DAY = 5
 
 export const WORK_TIME_SLOTS = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -50,12 +51,12 @@ export function getTehranParts(date = new Date()): TehranParts {
 }
 
 export function isWeeklyOff(date = new Date()) {
-    return getTehranParts(date).weekday === 2
+    return getTehranParts(date).weekday === WEEKLY_OFF_DAY
 }
 
 export function isWithinWorkingHours(date = new Date()) {
     const { hour, weekday } = getTehranParts(date)
-    if (weekday === 2) return false
+    if (weekday === WEEKLY_OFF_DAY) return false
     return hour >= WORK_START_HOUR && hour < WORK_END_HOUR
 }
 

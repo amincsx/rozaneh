@@ -26,7 +26,7 @@ export async function GET() {
     return NextResponse.json({
         success: true,
         callNowAvailable: isCallNowAvailable(),
-        workingHours: '۹ صبح تا ۹ شب (به جز سه‌شنبه)',
+        workingHours: '۹ صبح تا ۹ شب (به جز جمعه)',
     })
 }
 
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         if (callType === 'now') {
             if (!isCallNowAvailable()) {
                 return NextResponse.json(
-                    { success: false, message: 'تماس فوری فقط در ساعات کاری (۹ صبح تا ۹ شب، غیر از سه‌شنبه) امکان‌پذیر است' },
+                    { success: false, message: 'تماس فوری فقط در ساعات کاری (۹ صبح تا ۹ شب، غیر از جمعه) امکان‌پذیر است' },
                     { status: 400 }
                 )
             }
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
             scheduledAt = buildScheduledDateTime(String(scheduledDate), String(scheduledTime))
             if (!scheduledAt) {
                 return NextResponse.json(
-                    { success: false, message: 'زمان انتخاب‌شده معتبر نیست. فقط ۹ صبح تا ۹ شب و غیر از سه‌شنبه' },
+                    { success: false, message: 'زمان انتخاب‌شده معتبر نیست. فقط ۹ صبح تا ۹ شب و غیر از جمعه' },
                     { status: 400 }
                 )
             }
