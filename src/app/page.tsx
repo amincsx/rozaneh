@@ -5,6 +5,7 @@ import HomeNavbar from "@/components/HomeNavbar";
 import FeaturedEssaySlider from "@/components/FeaturedEssaySlider";
 import SmoothPageScroll from "@/components/SmoothPageScroll";
 import HeroCarousel from "@/components/HeroCarousel";
+import TherapistPhotoFan from "@/components/TherapistPhotoFan";
 
 export const dynamic = "force-dynamic";
 
@@ -88,23 +89,6 @@ export default function Home() {
             background-position: bottom center 50px;
           }
         }
-        .sitting-conversation-img {
-          max-height: 70vh;
-        }
-        @media (max-width: 767px) {
-          .sitting-conversation-img {
-            max-height: 25vh !important;
-            transform: translateY(60px);
-          }
-        }
-          
-
-        @media (min-width: 1024px) {
-          .sitting-conversation-img {
-            max-height: 80vh;
-          }
-    
-        }
       `}</style>
       {/* First Page */}
       <div
@@ -138,25 +122,16 @@ export default function Home() {
         className="scroll-section hero-second-section font-sans w-full h-screen bg-cover bg-center bg-no-repeat relative overflow-hidden"
       >
         {/* Heading */}
-        <h3 dir="rtl" className="absolute top-16 md:top-32 right-4 md:right-12 lg:right-20 3xl:right-56 text-right font-bold text-teal-700 text-base md:text-2xl lg:text-3xl font-arabic max-w-[calc(100vw-2rem)] px-2">
+        <h3 dir="rtl" className="absolute top-16 md:top-32 left-1/2 -translate-x-1/2 w-full px-4 text-center font-bold text-teal-700 text-base md:text-2xl lg:text-3xl font-arabic">
           تیمی از روانشناسان و مشاوران متخصص و با تجربه
         </h3>
 
         {/* Button */}
-        <Link href="/therapists" className="absolute top-28 md:top-52 right-4 md:right-12 lg:right-70 3xl:right-56 bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-light px-4 py-2 md:px-6 md:py-3 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm md:text-base font-arabic inline-block">
+        <Link href="/therapists" className="absolute top-28 md:top-52 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 font-light px-4 py-2 md:px-6 md:py-3 rounded-lg transition-all duration-300 hover:bg-white/30 hover:scale-105 shadow-sm text-sm md:text-base font-arabic inline-block whitespace-nowrap">
           مشاهده مشاوران
         </Link>
 
-        {/* Centered Image */}
-        <div className="absolute top-1/2 left-1/2 md:mt-30 transform -translate-x-1/2 -translate-y-1/2 w-[60vw] md:w-[70vw] lg:w-[60vw] md:top-1/2">
-          <Image
-            src="/sitting conversation-01.svg"
-            alt="Sitting Conversation"
-            width={900}
-            height={900}
-            className="sitting-conversation-img object-contain w-full h-auto md:max-h-[70vh] lg:max-h-[80vh]"
-          />
-        </div>
+        <TherapistPhotoFan />
       </div>
 
       {/* Fourth Page */}
